@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ site_name }} – Public Landing{% endblock %}
+
+{% block content %}
+<section id="mission" class="hero">
+  <div class="container">
+    <h1>UniVerse</h1>
+    <p class="lead">
+      A social‑academic platform that helps students share notes, connect, and find their way –
+      from courses and thesis help to housing tips and campus life.
+    </p>
+
+    <div class="big-buttons">
+      <a class="big-button" href="#courses"><span class="bb-title">Courses</span><span class="bb-sub">Find and organize course pages</span></a>
+      <a class="big-button" href="#notes"><span class="bb-title">Notes</span><span class="bb-sub">Share summaries, sheets, and past exams</span></a>
+      <a class="big-button" href="#opportunities"><span class="bb-title">Opportunities</span><span class="bb-sub">Housing, jobs, events, mentoring</span></a>
+      <a class="big-button" href="#howto"><span class="bb-title">How‑to</span><span class="bb-sub">Visa, bureaucracy, campus tips</span></a>
+    </div>
+
+    <p class="contrib-inline">
+      Want to help? <a href="#contribute">Contribute here</a>.
+    </p>
+  </div>
+</section>
+
+<section id="courses" class="section">
+  <div class="container">
+    <h2>Courses</h2>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tincidunt nunc eu pulvinar suscipit.
+      Focus: structured course hubs with links to lectures, study groups, and smart matching for peers.
+    </p>
+  </div>
+</section>
+
+<section id="notes" class="section">
+  <div class="container">
+    <h2>Notes</h2>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus.
+      Students can upload outlines, cheat‑sheets, and thesis tips with a light reputation system.
+    </p>
+  </div>
+</section>
+
+<section id="opportunities" class="section">
+  <div class="container">
+    <h2>Opportunities</h2>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula urna at dignissim efficitur.
+      Find housing leads, part‑time jobs, mentoring offers, and local events all in one place.
+    </p>
+  </div>
+</section>
+
+<section id="howto" class="section">
+  <div class="container">
+    <h2>How‑to</h2>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus lacinia eros vitae mollis laoreet.
+      Quick guides for visas, enrollment, bureaucracy, and everyday campus hacks.
+    </p>
+  </div>
+</section>
+
+<section id="contribute" class="section">
+  <div class="container">
+    <h2>How to contribute</h2>
+    <ol>
+      <li>Fork the repository and create a feature branch.</li>
+      <li>Add or edit a page in <code>templates/</code> or styles in <code>static/css/</code>.</li>
+      <li>Write a short description and open a pull request.</li>
+    </ol>
+    <p>
+      Ideas welcome: AI assistant, reputation & mentorship, OTH integrations, dashboards.
+    </p>
+  </div>
+</section>
+{% endblock %}

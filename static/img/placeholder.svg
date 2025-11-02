@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-label="Screenshot placeholder">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#1d1f2a"/>
+      <stop offset="1" stop-color="#111217"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="600" fill="url(#g)"/>
+  <g fill="#2a2b33">
+    <rect x="80" y="80" width="1040" height="440" rx="16"/>
+    <rect x="120" y="120" width="960" height="60" rx="8"/>
+    <rect x="120" y="200" width="620" height="260" rx="10"/>
+    <rect x="760" y="200" width="320" height="120" rx="10"/>
+    <rect x="760" y="340" width="320" height="120" rx="10"/>
+  </g>
+  <text x="600" y="560" font-family="Arial, sans-serif" font-size="22" text-anchor="middle" fill="#a0a0a0">Replace with your real screenshot</text>
+</svg>
