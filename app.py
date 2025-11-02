@@ -1,92 +1,180 @@
-import os
+"""
+Flask application for UniVerse - A social-academic hub for students.
+Provides courses, materials, and opportunities management.
+"""
+from typing import Dict, List
 from flask import Flask, render_template, abort, request
-from dotenv import load_dotenv
+from config import get_config
 from google_sheets_service import sheets_service
-import urllib.parse
-
-load_dotenv()
-
-ADD_OPPORTUNITY_URL = "https://docs.google.com/spreadsheets/d/1-bH05NhyJ1WFOcrmX0BtVVuvd4wWX4jx8VB-AYrOdQY/edit?gid=998865460#gid=998865460"
-ADD_MATERIAL_URL = "https://docs.google.com/spreadsheets/d/1-bH05NhyJ1WFOcrmX0BtVVuvd4wWX4jx8VB-AYrOdQY/edit?gid=935728683#gid=935728683"
 
 
-def create_app():
-    app = Flask(__name__)
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-change-me')
+def create_app(config_name: str = None) -> Flask:
+    """
+    Create and configure the Flask application.
 
-    @app.route('/')
+    Args:
+        config_name: Configuration environment name (development, production, testing)
+
+    Returns:
+        Flask: Configured Flask application instance
+    """
+    application = Flask(__name__)
+
+    # Load configuration
+    config = get_config(config_name)
+    application.config.from_object(config)
+
+    def get_common_template_context() -> Dict[str, str]:
+        """
+        Get common context variables used across all templates.
+
+        Returns:
+            Dict: Common template context with site name and analytics ID
+        """
+        return {
+            'site_name': config.APP_NAME,
+            'ga_id': config.GOOGLE_ANALYTICS_ID,
+        }
+
+    @application.route('/')
     def index():
-        return render_template(
-            'index.html',
-            site_name=os.getenv('SITE_NAME', 'UniVerse'),
-            ga_id=os.getenv('GA_MEASUREMENT_ID', '')
-        )
+        """Render the main landing page."""
+        return render_template('index.html', **get_common_template_context())
 
-    @app.route('/courses')
+    @application.route('/courses')
     def courses():
-        # Fetch courses from Google Sheets
-        courses_data = sheets_service.get_courses()
+        """
+        Render the courses listing page.
+        Fetches all courses from Google Sheets or fallback data.
+        """
+        all_courses = sheets_service.get_courses()
 
-        return render_template(
-            'courses.html',
-            site_name=os.getenv('SITE_NAME', 'UniVerse'),
-            ga_id=os.getenv('GA_MEASUREMENT_ID', ''),
-            courses=courses_data
-        )
+        template_context = get_common_template_context()
+        template_context['courses'] = all_courses
 
-    @app.route('/opportunities')
+        return render_template('courses.html', **template_context)
+
+    @application.route('/opportunities')
     def opportunities():
-        items = sheets_service.get_opportunities()
-        # derive unique filters from current data
-        all_types = sorted({(i.get('type') or '').strip() for i in items if (i.get('type') or '').strip()})
-        all_programmes = sorted({(i.get('programme') or '').strip() for i in items if (i.get('programme') or '').strip()})
+        """
+        Render the opportunities page with filtering capabilities.
+        Supports filtering by type and programme from query parameters.
+        """
+        all_opportunities = sheets_service.get_opportunities()
 
-        sel_type = (request.args.get('type') or '').strip()
-        sel_prog = (request.args.get('programme') or '').strip()
+        # Extract unique filter options from current data
+        available_types = _extract_unique_values(all_opportunities, 'type')
+        available_programmes = _extract_unique_values(all_opportunities, 'programme')
 
-        filtered = items
-        if sel_type:
-            filtered = [i for i in filtered if (i.get('type') or '').strip().lower() == sel_type.lower()]
-        if sel_prog:
-            filtered = [i for i in filtered if (i.get('programme') or '').strip().lower() == sel_prog.lower()]
+        # Get filter parameters from request
+        selected_type = request.args.get('type', '').strip()
+        selected_programme = request.args.get('programme', '').strip()
 
-        form_url = ADD_OPPORTUNITY_URL
-        return render_template(
-            'opportunities.html',
-            site_name=os.getenv('SITE_NAME', 'UniVerse'),
-            ga_id=os.getenv('GA_MEASUREMENT_ID', ''),
-            opportunities=filtered,
-            opportunities_form_url=form_url,
-            filters_types=all_types,
-            filters_programmes=all_programmes,
-            selected_type=sel_type,
-            selected_programme=sel_prog,
-            total_count=len(items)
+        # Apply filters
+        filtered_opportunities = _filter_opportunities(
+            all_opportunities,
+            selected_type,
+            selected_programme
         )
 
-    @app.route('/courses/<slug>')
-    def course_detail(slug):
+        template_context = get_common_template_context()
+        template_context.update({
+            'opportunities': filtered_opportunities,
+            'opportunities_form_url': config.ADD_OPPORTUNITY_SHEET_URL,
+            'filters_types': available_types,
+            'filters_programmes': available_programmes,
+            'selected_type': selected_type,
+            'selected_programme': selected_programme,
+            'total_count': len(all_opportunities)
+        })
+
+        return render_template('opportunities.html', **template_context)
+
+    def _extract_unique_values(items: List[Dict], field_name: str) -> List[str]:
+        """
+        Extract unique non-empty values for a specific field from a list of dictionaries.
+
+        Args:
+            items: List of dictionaries
+            field_name: Name of the field to extract
+
+        Returns:
+            List[str]: Sorted list of unique values
+        """
+        unique_values = {
+            (item.get(field_name) or '').strip()
+            for item in items
+            if (item.get(field_name) or '').strip()
+        }
+        return sorted(unique_values)
+
+    def _filter_opportunities(
+        opportunities: List[Dict],
+        filter_type: str,
+        filter_programme: str
+    ) -> List[Dict]:
+        """
+        Filter opportunities by type and/or programme.
+
+        Args:
+            opportunities: List of opportunity dictionaries
+            filter_type: Type filter (case-insensitive), empty string means no filter
+            filter_programme: Programme filter (case-insensitive), empty string means no filter
+
+        Returns:
+            List[Dict]: Filtered opportunities
+        """
+        filtered = opportunities
+
+        if filter_type:
+            filtered = [
+                opp for opp in filtered
+                if (opp.get('type') or '').strip().lower() == filter_type.lower()
+            ]
+
+        if filter_programme:
+            filtered = [
+                opp for opp in filtered
+                if (opp.get('programme') or '').strip().lower() == filter_programme.lower()
+            ]
+
+        return filtered
+
+    @application.route('/courses/<slug>')
+    def course_detail(slug: str):
+        """
+        Render the detailed page for a specific course.
+
+        Args:
+            slug: URL-friendly course identifier
+
+        Returns:
+            Rendered template or 404 error if course not found
+        """
         course = sheets_service.get_course_by_slug(slug)
+
         if not course:
             abort(404)
-        # Load materials for this course
-        materials = sheets_service.get_course_materials(slug)
-        # Use provided spreadsheet link for adding materials
-        materials_form_url = ADD_MATERIAL_URL
 
-        return render_template(
-            'course_detail.html',
-            site_name=os.getenv('SITE_NAME', 'UniVerse'),
-            ga_id=os.getenv('GA_MEASUREMENT_ID', ''),
-            course=course,
-            materials=materials,
-            materials_form_url=materials_form_url
-        )
+        # Load materials associated with this course
+        course_materials = sheets_service.get_course_materials(slug)
 
-    return app
+        template_context = get_common_template_context()
+        template_context.update({
+            'course': course,
+            'materials': course_materials,
+            'materials_form_url': config.ADD_MATERIAL_SHEET_URL
+        })
+
+        return render_template('course_detail.html', **template_context)
+
+    return application
 
 
+# Create application instance
 app = create_app()
 
 if __name__ == '__main__':
+    # Run development server
     app.run(debug=True)
+

@@ -1,3 +1,33 @@
-console.log('Landing ready');
+/**
+ * Main JavaScript file for UniVerse application
+ * Handles common functionality across all pages
+ */
 
-document.getElementById('year').textContent = new Date().getFullYear();
+(function() {
+    'use strict';
+
+    /**
+     * Initialize the application when DOM is ready
+     */
+    function initializeApplication() {
+        console.log('UniVerse application initialized');
+        updateCopyrightYear();
+    }
+
+    /**
+     * Update the copyright year in the footer
+     */
+    function updateCopyrightYear() {
+        const yearElement = document.getElementById('year');
+        if (yearElement) {
+            yearElement.textContent = new Date().getFullYear();
+        }
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeApplication);
+    } else {
+        initializeApplication();
+    }
+})();

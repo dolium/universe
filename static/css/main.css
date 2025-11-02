@@ -1,24 +1,70 @@
+/**
+ * UniVerse - Main Stylesheet
+ * Dark theme design for academic platform
+ */
+
+/* ============================================
+   CSS VARIABLES (Design Tokens)
+   ============================================ */
 :root {
-  --bg: #0b0c10;
-  --panel: #111217;
-  --text: #e6e6e6;
-  --muted: #a0a0a0;
-  --primary: #4f46e5;
-  --primary-contrast: #ffffff;
-  --radius: 14px;
+  /* Color Palette */
+  --color-background: #0b0c10;
+  --color-panel: #111217;
+  --color-text-primary: #e6e6e6;
+  --color-text-muted: #a0a0a0;
+  --color-primary: #4f46e5;
+  --color-primary-contrast: #ffffff;
+
+  /* Spacing & Layout */
+  --border-radius: 14px;
+  --container-max-width: 1100px;
+
+  /* Legacy variable names (for backward compatibility) */
+  --bg: var(--color-background);
+  --panel: var(--color-panel);
+  --text: var(--color-text-primary);
+  --muted: var(--color-text-muted);
+  --primary: var(--color-primary);
+  --primary-contrast: var(--color-primary-contrast);
+  --radius: var(--border-radius);
 }
-* { box-sizing: border-box; }
-html, body { height: 100%; }
+
+/* ============================================
+   GLOBAL STYLES
+   ============================================ */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
-  background: var(--bg);
-  color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  line-height: 1.6;
 }
-.container { max-width: 1100px; margin: 0 auto; padding: 20px; }
 
-/* header */
-.site-header { position: sticky; top: 0; backdrop-filter: blur(8px); background: rgba(11,12,16,0.7); border-bottom: 1px solid #1f2027; }
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ============================================
+   HEADER & NAVIGATION
+   ============================================ */
+.site-header {
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(8px);
+  background: rgba(11, 12, 16, 0.7);
+  border-bottom: 1px solid #1f2027;
+  z-index: 1000;
+}
 .toolbar {
   display: grid;
   grid-template-columns: 1fr auto 1fr; /* left - center - right */
@@ -27,40 +73,141 @@ body {
 }
 .brand { font-weight: 700; text-decoration: none; color: var(--text); opacity: .95; }
 
-/* centered nav */
-.nav { display: flex; justify-content: center; gap: 18px; }
-.nav a { color: var(--muted); text-decoration: none; padding: 8px 12px; border-radius: 10px; border: 1px solid transparent; }
-.nav a:hover { color: var(--text); background: #0f1015; border-color: #2a2b33; }
+/* Navigation Menu (centered) */
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
 
-/* right tools */
-.toolbar-tools { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
-.btn { display: inline-block; padding: 12px 18px; border-radius: var(--radius); border: 1px solid #2a2b33; color: var(--text); text-decoration: none; }
-.btn:hover { border-color: #3a3b46; }
-.btn.small { padding: 8px 12px; font-size: 14px; }
-.btn-primary { background: var(--primary); color: var(--primary-contrast); border: none; }
+.nav a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
 
-/* hero and sections */
-.hero { padding: 64px 0; }
-.hero h1 { font-size: 44px; margin: 0 0 10px; }
-.lead { color: var(--muted); font-size: 18px; max-width: 800px; }
-.section { padding: 40px 0; }
-.cta { padding: 48px 0; text-align: center; }
-.site-footer { border-top: 1px solid #1f2027; margin-top: 40px; }
+.nav a:hover {
+  color: var(--color-text-primary);
+  background: #0f1015;
+  border-color: #2a2b33;
+}
 
-/* 4 big buttons */
-.big-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 24px 0 8px; }
+/* Toolbar Right Section */
+.toolbar-tools {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+  display: inline-block;
+  padding: 12px 18px;
+  border-radius: var(--border-radius);
+  border: 1px solid #2a2b33;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn:hover {
+  border-color: #3a3b46;
+  transform: translateY(-1px);
+}
+
+.btn.small {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #4338ca;
+}
+
+/* ============================================
+   PAGE SECTIONS
+   ============================================ */
+.hero {
+  padding: 64px 0;
+}
+
+.hero h1 {
+  font-size: 44px;
+  margin: 0 0 10px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.lead {
+  color: var(--color-text-muted);
+  font-size: 18px;
+  max-width: 800px;
+}
+
+.section {
+  padding: 40px 0;
+}
+
+.cta {
+  padding: 48px 0;
+  text-align: center;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.site-footer {
+  border-top: 1px solid #1f2027;
+  margin-top: 40px;
+  padding: 20px 0;
+}
+
+/* ============================================
+   BIG BUTTONS COMPONENT (Landing Page)
+   ============================================ */
+.big-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin: 24px 0 8px;
+}
 .big-button { display: flex; flex-direction: column; gap: 6px; padding: 22px; background: var(--panel); border: 1px solid #1f2027; border-radius: 16px; text-decoration: none; color: var(--text); box-shadow: 0 6px 20px rgba(0,0,0,.25); }
 .big-button:hover { border-color: #2a2b33; transform: translateY(-1px); }
 .bb-title { font-size: 18px; font-weight: 700; }
 .bb-sub { color: var(--muted); font-size: 14px; }
 .contrib-inline { margin-top: 8px; color: var(--muted); }
 
-/* responsive */
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablet Breakpoint (1020px and below) */
 @media (max-width: 1020px) {
-  .big-buttons { grid-template-columns: repeat(2, 1fr); }
+  .big-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
+/* Mobile Breakpoint (640px and below) */
 @media (max-width: 640px) {
-  .toolbar { grid-template-columns: auto auto 1fr; grid-template-areas: "brand menu tools" "nav nav nav"; row-gap: 10px; }
+  .toolbar {
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas: "brand menu tools" "nav nav nav";
+    row-gap: 10px;
+  }
   .brand { grid-area: brand; }
   .menu-btn { display: block; grid-area: menu; justify-self: center; }
   .toolbar-tools { grid-area: tools; }
@@ -70,14 +217,29 @@ body {
   .big-buttons { grid-template-columns: 1fr; }
 }
 
-/* hamburger */
-.menu-btn { display: none; position: relative; width: 40px; height: 40px; border: 1px solid #2a2b33; border-radius: 12px; }
+/* ============================================
+   MOBILE HAMBURGER MENU
+   ============================================ */
+.menu-btn {
+  display: none;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #2a2b33;
+  border-radius: 12px;
+  cursor: pointer;
+  background: transparent;
+}
 .menu-btn span, .menu-btn::before, .menu-btn::after { content: ""; position: absolute; left: 9px; right: 9px; height: 2px; background: var(--text); }
 .menu-btn span { top: 19px; }
 .menu-btn::before { top: 12px; }
 .menu-btn::after { bottom: 12px; }
 
-/* Courses Page Styles */
+/* ============================================
+   COURSES PAGE STYLES
+   ============================================ */
+
+/* Courses Hero Section */
 .courses-hero {
   text-align: center;
   padding: 80px 20px 60px;
@@ -128,6 +290,7 @@ body {
   line-height: 1.6;
 }
 
+/* Courses Grid Layout */
 .courses-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
@@ -135,6 +298,7 @@ body {
   margin-bottom: 60px;
 }
 
+/* Course Card Component */
 .course-card {
   background: linear-gradient(135deg, var(--panel) 0%, #16171f 100%);
   border: 1px solid #1f2027;
@@ -309,7 +473,9 @@ body {
   }
 }
 
-/* Course detail page */
+/* ============================================
+   COURSE DETAIL PAGE
+   ============================================ */
 .course-detail .course-header {
   display: grid;
   grid-template-columns: 96px 1fr;
