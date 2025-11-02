@@ -5,15 +5,15 @@
 {% block content %}
 <div class="courses-hero">
     <div class="container">
-        <h1>Available Courses</h1>
-        <p>Explore our comprehensive collection of courses across various disciplines</p>
+        <h1>STEM Courses</h1>
+        <p>Explore our STEM catalog — mathematics, physics, chemistry, biology, CS, and engineering</p>
     </div>
 </div>
 
 <div class="container">
     <div class="courses-grid">
         {% for course in courses %}
-        <a href="#" class="course-card">
+        <a href="{{ url_for('course_detail', slug=course.slug) }}" class="course-card">
             <div class="course-icon">
                 {% if course.icon == 'math' %}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -67,4 +67,3 @@
     </div>
 </div>
 {% endblock %}
-
