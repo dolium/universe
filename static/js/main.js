@@ -12,6 +12,7 @@
     function initializeApplication() {
         console.log('UniVerse application initialized');
         updateCopyrightYear();
+        enableTimetableSearchAutoSubmit();
     }
 
     /**
@@ -22,6 +23,20 @@
         if (yearElement) {
             yearElement.textContent = new Date().getFullYear();
         }
+    }
+
+    function enableTimetableSearchAutoSubmit() {
+        const form = document.querySelector('form[action*="timetable"]');
+        if (!form) return;
+        const searchInput = form.querySelector('input[name="search"]');
+        if (!searchInput) return;
+        let timer;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                form.submit();
+            }, 350);
+        });
     }
 
     // Initialize when DOM is ready

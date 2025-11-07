@@ -32,6 +32,7 @@ class GoogleSheetsService:
         self.credentials_file_path = config.GOOGLE_CREDENTIALS_FILE
         self.materials_worksheet_name = config.MATERIALS_WORKSHEET_NAME
         self.opportunities_worksheet_name = config.OPPORTUNITIES_WORKSHEET_NAME
+        self.timetable_worksheet_name = config.TIMETABLE_WORKSHEET_NAME
         self.google_client = None
         self.current_data_source = self.DATA_SOURCE_UNKNOWN
 
@@ -394,6 +395,199 @@ class GoogleSheetsService:
             { 'title': 'Part‑time Lab Assistant', 'type': 'job', 'programme': 'Physics', 'description': 'Assist in undergraduate lab sessions 10h/week.' },
             { 'title': 'Hackathon Weekend', 'type': 'fun', 'programme': 'CS', 'description': '48‑hour hackathon with mentors and prizes.' },
             { 'title': 'Tutoring Group: Calculus', 'type': 'study', 'programme': 'Engineering', 'description': 'Weekly peer tutoring for Calculus I.' },
+        ]
+
+    def _norm(self, s: str) -> str:
+        """Normalize strings for comparison (strip, collapse spaces, lowercase)."""
+        if s is None:
+            return ''
+        return ' '.join(str(s).strip().split()).lower()
+
+    def _detect_program_sem_key(self, keys: List[str]) -> Optional[str]:
+        """
+        Try to detect the Program/Semester-like column key.
+        Accepts variants like 'Program/Semester', 'Programm/Semester', 'Studiengang/Semester',
+        or any key that has tokens for program/studien and sem/semester.
+        """
+        if not keys:
+            return None
+        # Strong candidates (common exact headers)
+        preferred = [
+            'Program/Semester', 'Programm/Semester', 'Studiengang/Semester',
+            'Program - Semester', 'Programm - Semester'
+        ]
+        for k in keys:
+            if any(self._norm(k) == self._norm(p) for p in preferred):
+                return k
+        # Regex-based fallback
+        pattern = re.compile(r"(program|programm|studien\w*)\s*[/\-]?\s*(sem|semester)", re.IGNORECASE)
+        for k in keys:
+            if pattern.search(str(k)):
+                return k
+        # Separate columns fallback (if present): combine 'Program(me|m|Studiengang)' + 'Semester'
+        # We'll handle combination later during merge if needed
+        return None
+
+    def _merge_timetable_by_program_sem(self, entries: List[Dict[str, str]]) -> List[Dict[str, str]]:
+        """
+        Merge rows that are identical across all columns except the Program/Semester column.
+        Concatenate Program/Semester values with '/' in the resulting single row.
+        """
+        if not entries:
+            return entries
+
+        # Detect program/semester column
+        keys = list(entries[0].keys())
+        program_key = self._detect_program_sem_key(keys)
+
+        # If Program/Semester column not found, try to build a synthetic key from separate columns
+        separate_program_keys = []
+        semester_key = None
+        if program_key is None:
+            # find program-like
+            for k in keys:
+                kl = self._norm(k)
+                if ('program' in kl or 'programm' in kl or 'studien' in kl) and 'sem' not in kl:
+                    separate_program_keys.append(k)
+                if semester_key is None and ('semester' in kl or kl.endswith('sem')):
+                    semester_key = k
+
+        # If neither combined nor separate found, nothing to merge
+        can_merge = program_key is not None or (separate_program_keys and semester_key)
+        if not can_merge:
+            return entries
+
+        def build_group_key(entry: Dict[str, str]) -> tuple:
+            items = []
+            for k, v in entry.items():
+                if program_key:
+                    if k == program_key:
+                        continue
+                else:
+                    # skip separate components when building grouping key
+                    if k in separate_program_keys or k == semester_key:
+                        continue
+                items.append((k, self._norm(v)))
+            # sort to make deterministic
+            return tuple(sorted(items, key=lambda x: x[0]))
+
+        def get_program_value(entry: Dict[str, str]) -> str:
+            if program_key:
+                return str(entry.get(program_key, '')).strip()
+            # Combine separate components into one display string like "{Program}/{Semester}" or "{Program} {Semester}"
+            parts = []
+            # Some rows might have multiple program-like columns; concatenate them with space
+            prog_parts = [str(entry.get(k, '')).strip() for k in separate_program_keys if str(entry.get(k, '')).strip()]
+            if prog_parts:
+                parts.append(' '.join(prog_parts))
+            sem_val = str(entry.get(semester_key, '')).strip()
+            if sem_val:
+                # Use dot between program and semester if both exist, else just semester
+                if parts:
+                    parts[-1] = f"{parts[-1]}.{sem_val}"
+                else:
+                    parts.append(sem_val)
+            return '/'.join([p for p in parts if p])
+
+        merged = []
+        index = {}  # group_key -> idx in merged
+        value_sets = {}  # idx -> set of normalized program values
+
+        for entry in entries:
+            gk = build_group_key(entry)
+            prog_val_raw = get_program_value(entry)
+            prog_val_norm = self._norm(prog_val_raw)
+
+            if gk in index:
+                i = index[gk]
+                # Append program value if new
+                if prog_val_norm and prog_val_norm not in value_sets[i]:
+                    value_sets[i].add(prog_val_norm)
+                    # merge display string
+                    display = merged[i].get(program_key or 'Program/Semester', '')
+                    if display:
+                        display = f"{display}/{prog_val_raw}"
+                    else:
+                        display = prog_val_raw
+                    # set back to appropriate key
+                    if program_key:
+                        merged[i][program_key] = display
+                    else:
+                        # create synthetic combined column if needed
+                        merged[i]['Program/Semester'] = display
+                # else nothing to add
+            else:
+                # New group: clone row and initialize program value
+                new_row = dict(entry)
+                if program_key:
+                    new_row[program_key] = prog_val_raw
+                else:
+                    # ensure synthetic column exists and drop separate columns? Keep them for display consistency.
+                    new_row['Program/Semester'] = prog_val_raw
+                merged.append(new_row)
+                idx = len(merged) - 1
+                index[gk] = idx
+                value_sets[idx] = set()
+                if prog_val_norm:
+                    value_sets[idx].add(prog_val_norm)
+        return merged
+
+    def get_timetable(self) -> List[Dict[str, str]]:
+        """
+        Fetch all timetable entries from 'Timetable' worksheet.
+
+        Returns:
+            List[Dict]: List of timetable dictionaries with all column data
+        """
+        try:
+            # Ensure client is authenticated
+            if not self.google_client:
+                if not self.authenticate_with_google():
+                    return self._get_fallback_timetable()
+
+            if not self.spreadsheet_id:
+                return self._get_fallback_timetable()
+
+            spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
+
+            # Try to get worksheet by name
+            try:
+                timetable_worksheet = spreadsheet.worksheet(self.timetable_worksheet_name)
+            except Exception as e:
+                print(f"[WARNING] Could not find '{self.timetable_worksheet_name}' worksheet: {e}")
+                return self._get_fallback_timetable()
+
+            raw_records = timetable_worksheet.get_all_records()
+            timetable_entries = []
+
+            for record in raw_records:
+                entry = {}
+                for key, value in record.items():
+                    entry[key] = str(value).strip() if value else ''
+                if any(entry.values()):
+                    timetable_entries.append(entry)
+
+            # Merge duplicates differing only in Program/Semester
+            timetable_entries = self._merge_timetable_by_program_sem(timetable_entries)
+
+            return timetable_entries
+
+        except Exception as error:
+            print(f"[ERROR] Failed to fetch timetable: {error}")
+            return self._get_fallback_timetable()
+
+    def _get_fallback_timetable(self) -> List[Dict[str, str]]:
+        """
+        Return fallback timetable data when Google Sheets is unavailable.
+
+        Returns:
+            List[Dict]: List of sample timetable dictionaries
+        """
+        return [
+            { 'Tag': 'Montag', 'Zeit': '08:00-10:00', 'Fach': 'Mathematik II', 'Professor': 'Prof. Buhl', 'Raum': 'A101' },
+            { 'Tag': 'Montag', 'Zeit': '10:15-12:00', 'Fach': 'Physik I', 'Professor': 'Prof. Schmidt', 'Raum': 'B205' },
+            { 'Tag': 'Dienstag', 'Zeit': '08:00-10:00', 'Fach': 'Informatik I', 'Professor': 'Prof. Fischer', 'Raum': 'C302' },
+            { 'Tag': 'Mittwoch', 'Zeit': '14:00-16:00', 'Fach': 'Chemie', 'Professor': 'Prof. Weber', 'Raum': 'Lab 1' },
         ]
 
 

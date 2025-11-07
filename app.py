@@ -1,3 +1,7 @@
+#IDEA: CREATE A TIMETABLE BUT FOR EACH PROFESSOR SO YOU CAN SEE THE PROFESSORS' SCHEDULES
+
+
+
 """
 Flask application for UniVerse - A social-academic hub for students.
 Provides courses, materials, and opportunities management.
@@ -168,6 +172,168 @@ def create_app(config_name: str = None) -> Flask:
 
         return render_template('course_detail.html', **template_context)
 
+    @application.route('/timetable')
+    def timetable():
+        """
+        Render the timetable page with filtering capabilities.
+        Supports filtering by professor, day and search query from query parameters.
+        """
+        all_entries = sheets_service.get_timetable()
+
+        # Extract unique professors and days from current data
+        available_professors = _extract_unique_professors(all_entries)
+        professor_options = [{ 'value': _normalize_prof_name(p), 'label': p } for p in available_professors]
+        available_days = _extract_unique_days(all_entries)
+        day_options = [{ 'value': _normalize_day_value(d), 'label': d } for d in available_days]
+
+        # Get filter parameters from request
+        selected_professor = request.args.get('professor', '').strip()
+        selected_professor_value = _normalize_prof_name(selected_professor)
+        selected_day = request.args.get('day', '').strip()
+        selected_day_value = _normalize_day_value(selected_day)
+        search_query = request.args.get('search', '').strip()
+
+        # Apply filters
+        filtered_entries = _filter_timetable(
+            all_entries,
+            selected_professor,
+            selected_day,
+            search_query
+        )
+
+        template_context = get_common_template_context()
+        template_context.update({
+            'timetable_entries': filtered_entries,
+            'filters_professors': available_professors,
+            'professor_options': professor_options,
+            'filters_days': available_days,
+            'day_options': day_options,
+            'selected_professor': selected_professor,
+            'selected_professor_value': selected_professor_value,
+            'selected_day': selected_day,
+            'selected_day_value': selected_day_value,
+            'search_query': search_query,
+            'total_count': len(all_entries)
+        })
+
+        return render_template('timetable.html', **template_context)
+
+    # --- Timetable helpers (professor and day detection) ---
+    PROFESSOR_KEY_TOKENS = (
+        'prof',        # Professor, Professor/in
+        'dozent',      # Dozent, Dozent/in
+        'lehr',        # Lehrer, Lehrperson, Lehrkraft
+        'dozier',      # Dozierende
+        'unterricht',  # Unterrichtende
+    )
+
+    DAY_KEY_TOKENS = (
+        'tag',        # Tag, Wochentag
+        'woch',       # Woche, Wochentag
+        'day',        # Day, Weekday
+        'wochen',
+    )
+
+    def _get_professor_name(entry: Dict) -> str:
+        """
+        Extract professor name from timetable entry by checking common German/English key variants.
+        It detects keys that CONTAIN tokens like 'prof', 'dozent', 'lehr', etc. (case-insensitive).
+        """
+        # Direct fast-path for common names
+        val = (entry.get('Professor') or entry.get('Dozent') or entry.get('Lehrer') or
+               entry.get('Professor/in') or entry.get('Dozent/in') or entry.get('Lehrperson') or
+               entry.get('Lehrkraft') or entry.get('Dozierende') or '')
+        val = str(val).strip() if val else ''
+        if val:
+            return val
+        # Fallback: scan keys for token matches
+        for key, value in entry.items():
+            key_lower = str(key).lower()
+            if any(token in key_lower for token in PROFESSOR_KEY_TOKENS):
+                v = str(value).strip() if value else ''
+                if v:
+                    return v
+        return ''
+
+    def _get_day_value(entry: Dict) -> str:
+        """Extract day-of-week value from timetable entry using common key variants."""
+        val = (entry.get('Tag') or entry.get('Wochentag') or entry.get('Day') or entry.get('Weekday') or '')
+        val = str(val).strip() if val else ''
+        if val:
+            return val
+        for key, value in entry.items():
+            key_lower = str(key).lower()
+            if any(token in key_lower for token in DAY_KEY_TOKENS):
+                v = str(value).strip() if value else ''
+                if v:
+                    return v
+        return ''
+
+    def _normalize_prof_name(name: str) -> str:
+        """Normalize professor name for consistent comparison (strip, collapse spaces)."""
+        if not name:
+            return ''
+        return ' '.join(name.strip().split())
+
+    def _normalize_day_value(name: str) -> str:
+        """Normalize day value (strip, collapse spaces, lowercase)."""
+        if not name:
+            return ''
+        return ' '.join(str(name).strip().split()).lower()
+
+    def _extract_unique_professors(entries: List[Dict]) -> List[str]:
+        """Extract unique professor names from timetable entries (normalized, original preserved)."""
+        professors = {}
+        for entry in entries:
+            prof_raw = _get_professor_name(entry)
+            prof_norm = _normalize_prof_name(prof_raw)
+            if prof_norm and prof_norm not in professors:
+                professors[prof_norm] = prof_raw  # keep original formatting
+        return [professors[k] for k in sorted(professors.keys())]
+
+    def _extract_unique_days(entries: List[Dict]) -> List[str]:
+        """Extract unique day values from timetable entries (normalized, original preserved)."""
+        days = {}
+        for entry in entries:
+            day_raw = _get_day_value(entry)
+            day_norm = _normalize_day_value(day_raw)
+            if day_norm and day_norm not in days:
+                days[day_norm] = day_raw
+        # order by the common German weekday order if possible, otherwise alpha
+        order_map = {
+            'montag': 1, 'dienstag': 2, 'mittwoch': 3, 'donnerstag': 4, 'freitag': 5, 'samstag': 6, 'sonntag': 7
+        }
+        return [days[k] for k in sorted(days.keys(), key=lambda x: (order_map.get(x, 99), x))]
+
+    def _filter_timetable(
+        entries: List[Dict],
+        filter_professor: str,
+        filter_day: str,
+        search_query: str
+    ) -> List[Dict]:
+        """Filter timetable entries by professor, day and/or search query (normalized)."""
+        filtered = entries
+        if filter_professor:
+            fp_norm = _normalize_prof_name(filter_professor).lower()
+            filtered = [
+                e for e in filtered
+                if _normalize_prof_name(_get_professor_name(e)).lower() == fp_norm
+            ]
+        if filter_day:
+            fd_norm = _normalize_day_value(filter_day)
+            filtered = [
+                e for e in filtered
+                if _normalize_day_value(_get_day_value(e)) == fd_norm
+            ]
+        if search_query:
+            q = search_query.lower().strip()
+            if q:
+                filtered = [
+                    e for e in filtered
+                    if q in _normalize_prof_name(_get_professor_name(e)).lower()
+                ]
+        return filtered
+
     return application
 
 
@@ -177,4 +343,3 @@ app = create_app()
 if __name__ == '__main__':
     # Run development server
     app.run(debug=True)
-

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Stundenplan - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="courses-hero">
+  <div class="container">
+    <h1>Stundenplan</h1>
+    <p>Alle Vorlesungen und Veranstaltungen im Überblick</p>
+    <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:center;">
+      <form method="get" action="{{ url_for('timetable') }}" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <input
+          type="text"
+          name="search"
+          placeholder="Professor suchen..."
+          value="{{ search_query }}"
+          class="search-input"
+          style="padding:8px 12px; border-radius:8px; border:1px solid #2a2b33; background:var(--panel); color:#fff; min-width:200px;"
+        />
+        <select name="professor" onchange="this.form.submit()" class="btn small" style="background:var(--panel);border-color:#2a2b33;">
+          <option value="">Alle Professoren</option>
+          {% for opt in professor_options %}
+            <option value="{{ opt.value }}" {% if selected_professor_value and selected_professor_value|lower == opt.value|lower %}selected{% endif %}>{{ opt.label }}</option>
+          {% endfor %}
+        </select>
+        <select name="day" onchange="this.form.submit()" class="btn small" style="background:var(--panel);border-color:#2a2b33;">
+          <option value="">Alle Tage</option>
+          {% for opt in day_options %}
+            <option value="{{ opt.value }}" {% if selected_day_value and selected_day_value|lower == opt.value|lower %}selected{% endif %}>{{ opt.label }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn small">Suchen</button>
+        {% if selected_professor or selected_day or search_query %}
+          <a class="btn small" href="{{ url_for('timetable') }}">Zurücksetzen</a>
+        {% endif %}
+      </form>
+    </div>
+    <p class="muted" style="margin-top:8px">{{ timetable_entries|length }} von {{ total_count }} Einträgen werden angezeigt</p>
+  </div>
+</section>
+
+<div class="container" style="margin-bottom: 60px;">
+  {% if timetable_entries %}
+  <div class="timetable-wrapper" style="overflow-x: auto;">
+    <table class="timetable-table">
+      <thead>
+        <tr>
+          {% if timetable_entries[0] %}
+            {% for key in timetable_entries[0].keys() %}
+              <th>{{ key }}</th>
+            {% endfor %}
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in timetable_entries %}
+        <tr>
+          {% for key, value in entry.items() %}
+            <td>{{ value }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="course-card" style="max-width:600px; margin:40px auto; text-align:center;">
+    <h3>Keine Einträge gefunden</h3>
+    <p>Versuchen Sie es mit anderen Filterkriterien.</p>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.timetable-wrapper {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 30px;
+}
+
+.timetable-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 600px;
+}
+
+.timetable-table thead {
+  background: rgba(106, 90, 205, 0.1);
+}
+
+.timetable-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--accent);
+  border-bottom: 2px solid rgba(106, 90, 205, 0.3);
+  white-space: nowrap;
+}
+
+.timetable-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-light);
+}
+
+.timetable-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.timetable-table tbody tr:hover {
+  background: rgba(106, 90, 205, 0.05);
+}
+
+.timetable-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .timetable-wrapper {
+    padding: 15px;
+  }
+
+  .timetable-table th,
+  .timetable-table td {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+}
+</style>
+{% endblock %}
