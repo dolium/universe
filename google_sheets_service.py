@@ -104,7 +104,7 @@ class GoogleSheetsService:
         Fetch all courses from Google Sheet or fallback data.
 
         Returns:
-            List[Dict]: List of course dictionaries with keys: name, slug, professor, description, icon
+            List[Dict]: List of course dictionaries with keys: name, slug, professor, description, icon, programme
         """
         try:
             # Ensure client is authenticated
@@ -133,12 +133,18 @@ class GoogleSheetsService:
                 if not course_name:
                     continue
 
+                programme = self._extract_field_value(
+                    record,
+                    ['Study Programme', 'StudyProgram', 'Programme', 'Program']
+                )
+
                 course = {
                     'name': course_name,
                     'slug': self._create_url_slug(course_name),
                     'professor': record.get('Professor', '').strip(),
                     'description': record.get('Description', '').strip(),
                     'icon': record.get('Icon', 'default').strip(),
+                    'programme': programme,
                 }
                 courses.append(course)
 
@@ -330,40 +336,28 @@ class GoogleSheetsService:
         """
         fallback_courses = [
             {
-                'name': 'Mathematics II',
-                'professor': 'Prof. Buhl',
-                'description': 'Advanced calculus, linear algebra, and differential equations for engineering students.',
-                'icon': 'math'
+                'name': 'Mathematics I',
+                'slug': 'mathematics-i',
+                'professor': 'Prof. Euler',
+                'description': 'Foundations of calculus and linear algebra.',
+                'icon': 'math',
+                'programme': 'Mathematics',
             },
             {
                 'name': 'Physics I',
-                'professor': 'Prof. Schmidt',
-                'description': 'Classical mechanics, thermodynamics, and wave phenomena with laboratory work.',
-                'icon': 'physics'
-            },
-            {
-                'name': 'Chemistry Fundamentals',
-                'professor': 'Prof. Weber',
-                'description': 'Organic and inorganic chemistry principles with hands-on experiments.',
-                'icon': 'chemistry'
-            },
-            {
-                'name': 'Biology & Ecology',
-                'professor': 'Prof. Mueller',
-                'description': 'Molecular biology, genetics, and ecosystem studies with field research.',
-                'icon': 'biology'
+                'slug': 'physics-i',
+                'professor': 'Dr. Curie',
+                'description': 'Mechanics, oscillations, and thermodynamics.',
+                'icon': 'physics',
+                'programme': 'Physics',
             },
             {
                 'name': 'Computer Science I',
-                'professor': 'Prof. Fischer',
-                'description': 'Programming fundamentals, data structures, and algorithm design.',
-                'icon': 'cs'
-            },
-            {
-                'name': 'Engineering Design',
-                'professor': 'Prof. Becker',
-                'description': 'Principles of engineering design, CAD modeling, and project development.',
-                'icon': 'engineering'
+                'slug': 'computer-science-i',
+                'professor': 'Dr. Turing',
+                'description': 'Introduction to algorithms and programming.',
+                'icon': 'cs',
+                'programme': 'Computer Science',
             },
         ]
         # Generate slugs for all fallback courses

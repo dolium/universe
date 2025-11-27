@@ -138,6 +138,10 @@ body {
   background: #4338ca;
 }
 
+.btn.btn-ok-dark {
+  color: #000 !important;
+}
+
 /* ============================================
    PAGE SECTIONS
    ============================================ */
@@ -439,7 +443,83 @@ body {
   transform: translateX(4px);
 }
 
-/* Responsive adjustments for courses */
+/* Study programme tag on course cards */
+.course-programme-tag {
+  margin: 4px 0 8px;
+  font-size: 0.8rem;
+  color: var(--accent-soft, #aab0ff);
+  background: rgba(106, 90, 205, 0.18);
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* Course filters (study programme) */
+.course-filters {
+  background: var(--panel);
+  border-radius: 16px;
+  border: 1px solid #1f2027;
+  padding: 16px 18px 14px;
+  margin-bottom: 24px;
+}
+.course-filters-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.course-filters-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+.course-filters-active {
+  font-size: 12px;
+  color: var(--muted);
+}
+.course-filters-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.course-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #151622;
+  border: 1px solid #262738;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.course-filter-pill input[type="checkbox"] {
+  accent-color: #4f46e5;
+}
+.course-filter-pill:hover {
+  border-color: #3a3b46;
+  background: #181927;
+}
+.course-filter-pill input[type="checkbox"]:checked + span {
+  color: #e5e7ff;
+}
+.course-filters-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+}
+.course-filters-count {
+  font-size: 12px;
+}
+
+/* ============================================
+   RESPONSIVE COURSES PAGE
+   ============================================ */
 @media (max-width: 1020px) {
   .courses-grid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

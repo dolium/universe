@@ -47,14 +47,32 @@ def create_app(config_name: str = None) -> Flask:
 
     @application.route('/courses')
     def courses():
-        """
-        Render the courses listing page.
-        Fetches all courses from Google Sheets or fallback data.
-        """
+        """Render the courses listing page with optional filtering by study programme."""
         all_courses = sheets_service.get_courses()
 
+        # Собираем уникальные программы из курсов
+        available_programmes = _extract_unique_values(all_courses, 'programme')
+
+        # Множественный выбор программ: ?programme=CS&programme=Math
+        selected_programmes = request.args.getlist('programme')
+        selected_programmes_norm = {p.strip().lower() for p in selected_programmes if p.strip()}
+
+        if selected_programmes_norm:
+            def _matches_programme(course: Dict) -> bool:
+                prog = (course.get('programme') or '').strip().lower()
+                return prog in selected_programmes_norm
+
+            filtered_courses = [c for c in all_courses if _matches_programme(c)]
+        else:
+            filtered_courses = all_courses
+
         template_context = get_common_template_context()
-        template_context['courses'] = all_courses
+        template_context.update({
+            'courses': filtered_courses,
+            'filters_programmes': available_programmes,
+            'selected_programmes': list(selected_programmes_norm),
+            'total_courses_count': len(all_courses),
+        })
 
         return render_template('courses.html', **template_context)
 

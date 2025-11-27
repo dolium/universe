@@ -11,6 +11,38 @@
 </div>
 
 <div class="container">
+    {% if filters_programmes %}
+    <form method="get" class="course-filters">
+        <div class="course-filters-header">
+            <span class="course-filters-label">Filter by study programme:</span>
+            {% if selected_programmes and selected_programmes|length < filters_programmes|length %}
+            <span class="course-filters-active">{{ selected_programmes|length }} selected</span>
+            {% endif %}
+        </div>
+        <div class="course-filters-grid">
+            {% for prog in filters_programmes %}
+            {% set prog_lower = prog.lower() %}
+            <label class="course-filter-pill">
+                <input
+                  type="checkbox"
+                  name="programme"
+                  value="{{ prog }}"
+                  {% if prog_lower in selected_programmes %}checked{% endif %}
+                />
+                <span>{{ prog }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <div class="course-filters-actions">
+            <button type="submit" class="btn small btn-ok-dark">OK</button>
+            {% if selected_programmes %}
+            <a href="{{ url_for('courses') }}" class="btn small">Reset</a>
+            {% endif %}
+            <span class="course-filters-count muted">Showing {{ courses|length }} of {{ total_courses_count }} courses</span>
+        </div>
+    </form>
+    {% endif %}
+
     <div class="courses-grid">
         {% for course in courses %}
         <a href="{{ url_for('course_detail', slug=course.slug) }}" class="course-card">
@@ -59,6 +91,9 @@
             <h3 class="course-title">{{ course.name }}</h3>
             {% if course.professor %}
             <p class="course-professor">{{ course.professor }}</p>
+            {% endif %}
+            {% if course.programme %}
+            <p class="course-programme-tag">Study programme: {{ course.programme }}</p>
             {% endif %}
             <p class="course-description">{{ course.description }}</p>
             <span class="course-link">Explore Course →</span>
