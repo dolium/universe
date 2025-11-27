@@ -78,9 +78,8 @@ def create_app(config_name: str = None) -> Flask:
 
     @application.route('/opportunities')
     def opportunities():
-        """
-        Render the opportunities page with filtering capabilities.
-        Supports filtering by type and programme from query parameters.
+        """Render the opportunities page with filtering capabilities.
+        Supports filtering by type and multiple programmes from query parameters.
         """
         all_opportunities = sheets_service.get_opportunities()
 
@@ -90,13 +89,14 @@ def create_app(config_name: str = None) -> Flask:
 
         # Get filter parameters from request
         selected_type = request.args.get('type', '').strip()
-        selected_programme = request.args.get('programme', '').strip()
+        selected_programmes = request.args.getlist('programme')
+        selected_programmes_norm = {p.strip().lower() for p in selected_programmes if p.strip()}
 
         # Apply filters
         filtered_opportunities = _filter_opportunities(
             all_opportunities,
             selected_type,
-            selected_programme
+            selected_programmes_norm
         )
 
         template_context = get_common_template_context()
@@ -106,7 +106,7 @@ def create_app(config_name: str = None) -> Flask:
             'filters_types': available_types,
             'filters_programmes': available_programmes,
             'selected_type': selected_type,
-            'selected_programme': selected_programme,
+            'selected_programmes': list(selected_programmes_norm),
             'total_count': len(all_opportunities)
         })
 
@@ -133,19 +133,9 @@ def create_app(config_name: str = None) -> Flask:
     def _filter_opportunities(
         opportunities: List[Dict],
         filter_type: str,
-        filter_programme: str
+        filter_programmes: set
     ) -> List[Dict]:
-        """
-        Filter opportunities by type and/or programme.
-
-        Args:
-            opportunities: List of opportunity dictionaries
-            filter_type: Type filter (case-insensitive), empty string means no filter
-            filter_programme: Programme filter (case-insensitive), empty string means no filter
-
-        Returns:
-            List[Dict]: Filtered opportunities
-        """
+        """Filter opportunities by type and/or a set of programmes (case-insensitive)."""
         filtered = opportunities
 
         if filter_type:
@@ -154,10 +144,10 @@ def create_app(config_name: str = None) -> Flask:
                 if (opp.get('type') or '').strip().lower() == filter_type.lower()
             ]
 
-        if filter_programme:
+        if filter_programmes:
             filtered = [
                 opp for opp in filtered
-                if (opp.get('programme') or '').strip().lower() == filter_programme.lower()
+                if (opp.get('programme') or '').strip().lower() in filter_programmes
             ]
 
         return filtered

@@ -7,25 +7,48 @@
   <div class="container">
     <h1>Opportunities</h1>
     <p>Jobs, events, study groups, and more submitted by the community</p>
-    <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:center;">
+    <div style="margin-top:16px; display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start; justify-content:center;">
       {% if opportunities_form_url %}
         <a class="btn btn-primary" target="_blank" rel="noopener" href="{{ opportunities_form_url }}">Add new opportunity</a>
       {% endif %}
-      <form method="get" action="{{ url_for('opportunities') }}" style="display:flex; gap:10px; align-items:center;">
+
+      <form method="get" action="{{ url_for('opportunities') }}" style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start; justify-content:center; max-width:900px;">
         <select name="type" onchange="this.form.submit()" class="btn small" style="background:var(--panel);border-color:#2a2b33;">
           <option value="">All types</option>
           {% for t in filters_types %}
             <option value="{{ t }}" {% if selected_type and selected_type|lower == t|lower %}selected{% endif %}>{{ t }}</option>
           {% endfor %}
         </select>
-        <select name="programme" onchange="this.form.submit()" class="btn small" style="background:var(--panel);border-color:#2a2b33;">
-          <option value="">All programmes</option>
-          {% for p in filters_programmes %}
-            <option value="{{ p }}" {% if selected_programme and selected_programme|lower == p|lower %}selected{% endif %}>{{ p }}</option>
-          {% endfor %}
-        </select>
-        {% if selected_type or selected_programme %}
-          <a class="btn small" href="{{ url_for('opportunities') }}">Reset</a>
+
+        {% if filters_programmes %}
+        <div class="course-filters" style="margin:0; min-width:260px;">
+          <div class="course-filters-header">
+            <span class="course-filters-label">Study programmes:</span>
+            {% if selected_programmes and selected_programmes|length < filters_programmes|length %}
+            <span class="course-filters-active">{{ selected_programmes|length }} selected</span>
+            {% endif %}
+          </div>
+          <div class="course-filters-grid">
+            {% for p in filters_programmes %}
+            {% set p_lower = p.lower() %}
+            <label class="course-filter-pill">
+              <input
+                type="checkbox"
+                name="programme"
+                value="{{ p }}"
+                {% if p_lower in selected_programmes %}checked{% endif %}
+              />
+              <span>{{ p }}</span>
+            </label>
+            {% endfor %}
+          </div>
+          <div class="course-filters-actions">
+            <button type="submit" class="btn small btn-ok-dark">OK</button>
+            {% if selected_type or selected_programmes %}
+            <a href="{{ url_for('opportunities') }}" class="btn small">Reset</a>
+            {% endif %}
+          </div>
+        </div>
         {% endif %}
       </form>
     </div>
