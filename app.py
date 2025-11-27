@@ -175,10 +175,10 @@ def create_app(config_name: str = None) -> Flask:
     @application.route('/timetable')
     def timetable():
         """
-        Render the timetable page with filtering capabilities.
+        Render the professor availability page with filtering capabilities.
         Supports filtering by professor, day and search query from query parameters.
         """
-        all_entries = sheets_service.get_timetable()
+        all_entries = sheets_service.get_professor_availability()
 
         # Extract unique professors and days from current data
         available_professors = _extract_unique_professors(all_entries)
@@ -194,7 +194,7 @@ def create_app(config_name: str = None) -> Flask:
         search_query = request.args.get('search', '').strip()
 
         # Apply filters
-        filtered_entries = _filter_timetable(
+        filtered_entries = _filter_availability(
             all_entries,
             selected_professor,
             selected_day,
@@ -203,7 +203,7 @@ def create_app(config_name: str = None) -> Flask:
 
         template_context = get_common_template_context()
         template_context.update({
-            'timetable_entries': filtered_entries,
+            'availability_entries': filtered_entries,
             'filters_professors': available_professors,
             'professor_options': professor_options,
             'filters_days': available_days,
@@ -218,7 +218,7 @@ def create_app(config_name: str = None) -> Flask:
 
         return render_template('timetable.html', **template_context)
 
-    # --- Timetable helpers (professor and day detection) ---
+    # --- Professor Availability helpers (professor and day detection) ---
     PROFESSOR_KEY_TOKENS = (
         'prof',        # Professor, Professor/in
         'dozent',      # Dozent, Dozent/in
@@ -236,7 +236,7 @@ def create_app(config_name: str = None) -> Flask:
 
     def _get_professor_name(entry: Dict) -> str:
         """
-        Extract professor name from timetable entry by checking common German/English key variants.
+        Extract professor name from availability entry by checking common German/English key variants.
         It detects keys that CONTAIN tokens like 'prof', 'dozent', 'lehr', etc. (case-insensitive).
         """
         # Direct fast-path for common names
@@ -256,7 +256,7 @@ def create_app(config_name: str = None) -> Flask:
         return ''
 
     def _get_day_value(entry: Dict) -> str:
-        """Extract day-of-week value from timetable entry using common key variants."""
+        """Extract day-of-week value from availability entry using common key variants."""
         val = (entry.get('Tag') or entry.get('Wochentag') or entry.get('Day') or entry.get('Weekday') or '')
         val = str(val).strip() if val else ''
         if val:
@@ -282,7 +282,7 @@ def create_app(config_name: str = None) -> Flask:
         return ' '.join(str(name).strip().split()).lower()
 
     def _extract_unique_professors(entries: List[Dict]) -> List[str]:
-        """Extract unique professor names from timetable entries (normalized, original preserved)."""
+        """Extract unique professor names from availability entries (normalized, original preserved)."""
         professors = {}
         for entry in entries:
             prof_raw = _get_professor_name(entry)
@@ -292,7 +292,7 @@ def create_app(config_name: str = None) -> Flask:
         return [professors[k] for k in sorted(professors.keys())]
 
     def _extract_unique_days(entries: List[Dict]) -> List[str]:
-        """Extract unique day values from timetable entries (normalized, original preserved)."""
+        """Extract unique day values from availability entries (normalized, original preserved)."""
         days = {}
         for entry in entries:
             day_raw = _get_day_value(entry)
@@ -305,13 +305,13 @@ def create_app(config_name: str = None) -> Flask:
         }
         return [days[k] for k in sorted(days.keys(), key=lambda x: (order_map.get(x, 99), x))]
 
-    def _filter_timetable(
+    def _filter_availability(
         entries: List[Dict],
         filter_professor: str,
         filter_day: str,
         search_query: str
     ) -> List[Dict]:
-        """Filter timetable entries by professor, day and/or search query (normalized)."""
+        """Filter availability entries by professor, day and/or search query (normalized)."""
         filtered = entries
         if filter_professor:
             fp_norm = _normalize_prof_name(filter_professor).lower()

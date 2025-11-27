@@ -12,7 +12,7 @@
     function initializeApplication() {
         console.log('UniVerse application initialized');
         updateCopyrightYear();
-        enableTimetableSearchAutoSubmit();
+        enableProfessorAvailabilitySearchAutoSubmit();
     }
 
     /**
@@ -25,7 +25,7 @@
         }
     }
 
-    function enableTimetableSearchAutoSubmit() {
+    function enableProfessorAvailabilitySearchAutoSubmit() {
         const form = document.querySelector('form[action*="timetable"]');
         if (!form) return;
         const searchInput = form.querySelector('input[name="search"]');

@@ -1,26 +1,26 @@
-# Timetable Feature Implementation
+# Professor Availability Feature Implementation
 
 ## Overview
-Added a new timetable page that displays schedule data from Google Sheets with filtering capabilities for professors and search functionality.
+Added a new professor availability page that displays schedule data from Google Sheets with filtering capabilities for professors and search functionality.
 
 ## Changes Made
 
 ### 1. Configuration (`config.py`)
-- Added `TIMETABLE_WORKSHEET_NAME` configuration to specify the worksheet name (defaults to 'Timetable')
+- Added `PROFESSOR_AVAILABILITY_WORKSHEET_NAME` configuration to specify the worksheet name (defaults to 'Timetable')
 
 ### 2. Google Sheets Service (`google_sheets_service.py`)
-- Added `timetable_worksheet_name` property to service initialization
-- Implemented `get_timetable()` method that:
+- Added `professor_availability_worksheet_name` property to service initialization
+- Implemented `get_professor_availability()` method that:
   - Fetches all data from the 'Timetable' worksheet
   - Supports any column structure (dynamic table headers)
   - Falls back to sample data if Google Sheets is unavailable
-- Added `_get_fallback_timetable()` method with sample German timetable data
+- Added `_get_fallback_professor_availability()` method with sample German availability data
 
 ### 3. Flask Application (`app.py`)
 - Added `/timetable` route with filtering capabilities
 - Implemented helper functions:
-  - `_extract_unique_professors()`: Extracts unique professor names from timetable entries
-  - `_filter_timetable()`: Filters entries by professor selection or search query
+  - `_extract_unique_professors()`: Extracts unique professor names from availability entries
+  - `_filter_availability()`: Filters entries by professor selection or search query
   - `_get_professor_name()`: Handles multiple possible column names for professors (Professor, Dozent, Lehrer)
 
 ### 4. Template (`templates/timetable.html`)
@@ -28,17 +28,20 @@ Added a new timetable page that displays schedule data from Google Sheets with f
   - Dark theme styling consistent with the rest of the site
   - Search input for finding professors
   - Dropdown filter for selecting specific professors
+  - Day-of-week filter dropdown
   - Dynamic table that displays all columns from the Google Sheet
   - Responsive design for mobile devices
   - Filter count showing "X of Y entries displayed"
-  - German language labels (Stundenplan, Professor suchen, etc.)
+  - German language labels
 
 ### 5. Navigation (`templates/base.html`)
-- Added "Timetable" link to the main navigation menu
+- Added "Professor Availability" link to the main navigation menu
+- Removed "Notes" navigation item
 
 ## Features
 
-### Search & Filter
+- **Professor Dropdown**: Select a specific professor to filter availability
+- **Day Dropdown**: Filter by specific day of the week
 - **Search Bar**: Type to search for professors by name (case-insensitive)
 - **Professor Dropdown**: Select a specific professor to filter the timetable
 - **Reset Button**: Clear all filters and show all entries
@@ -46,6 +49,7 @@ Added a new timetable page that displays schedule data from Google Sheets with f
 
 ### Dynamic Table Display
 - Automatically displays all columns from your Google Sheet
+- Automatically merges duplicate rows that differ only in Program/Semester column
 - No hardcoded column names - works with any table structure
 - Supports German column names (Tag, Zeit, Fach, Professor, Raum, etc.)
 
@@ -67,15 +71,16 @@ Example structure:
 Tag       | Zeit        | Fach           | Professor      | Raum
 Montag    | 08:00-10:00 | Mathematik II  | Prof. Buhl     | A101
 Dienstag  | 10:15-12:00 | Physik I       | Prof. Schmidt  | B205
-```
+1. Navigate to `/timetable` or click "Professor Availability" in the navigation menu
 
 ## Usage
-
-1. Navigate to `/timetable` or click "Timetable" in the navigation menu
+4. Filter by day of the week using the day dropdown
+5. Click "Zurücksetzen" (Reset) to clear filters
+6. The table will update automatically based on your filters
 2. Use the search bar to find specific professors
 3. Or use the dropdown to filter by a specific professor
 4. Click "Zurücksetzen" (Reset) to clear filters
-5. The table will update automatically based on your filters
+The professor availability page uses the same dark theme as the rest of the application:
 
 ## Styling
 

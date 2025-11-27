@@ -32,7 +32,7 @@ class GoogleSheetsService:
         self.credentials_file_path = config.GOOGLE_CREDENTIALS_FILE
         self.materials_worksheet_name = config.MATERIALS_WORKSHEET_NAME
         self.opportunities_worksheet_name = config.OPPORTUNITIES_WORKSHEET_NAME
-        self.timetable_worksheet_name = config.TIMETABLE_WORKSHEET_NAME
+        self.professor_availability_worksheet_name = config.PROFESSOR_AVAILABILITY_WORKSHEET_NAME
         self.google_client = None
         self.current_data_source = self.DATA_SOURCE_UNKNOWN
 
@@ -532,56 +532,56 @@ class GoogleSheetsService:
                     value_sets[idx].add(prog_val_norm)
         return merged
 
-    def get_timetable(self) -> List[Dict[str, str]]:
+    def get_professor_availability(self) -> List[Dict[str, str]]:
         """
-        Fetch all timetable entries from 'Timetable' worksheet.
+        Fetch all professor availability entries from 'Timetable' worksheet.
 
         Returns:
-            List[Dict]: List of timetable dictionaries with all column data
+            List[Dict]: List of availability dictionaries with all column data
         """
         try:
             # Ensure client is authenticated
             if not self.google_client:
                 if not self.authenticate_with_google():
-                    return self._get_fallback_timetable()
+                    return self._get_fallback_professor_availability()
 
             if not self.spreadsheet_id:
-                return self._get_fallback_timetable()
+                return self._get_fallback_professor_availability()
 
             spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
 
             # Try to get worksheet by name
             try:
-                timetable_worksheet = spreadsheet.worksheet(self.timetable_worksheet_name)
+                timetable_worksheet = spreadsheet.worksheet(self.professor_availability_worksheet_name)
             except Exception as e:
-                print(f"[WARNING] Could not find '{self.timetable_worksheet_name}' worksheet: {e}")
-                return self._get_fallback_timetable()
+                print(f"[WARNING] Could not find '{self.professor_availability_worksheet_name}' worksheet: {e}")
+                return self._get_fallback_professor_availability()
 
             raw_records = timetable_worksheet.get_all_records()
-            timetable_entries = []
+            availability_entries = []
 
             for record in raw_records:
                 entry = {}
                 for key, value in record.items():
                     entry[key] = str(value).strip() if value else ''
                 if any(entry.values()):
-                    timetable_entries.append(entry)
+                    availability_entries.append(entry)
 
             # Merge duplicates differing only in Program/Semester
-            timetable_entries = self._merge_timetable_by_program_sem(timetable_entries)
+            availability_entries = self._merge_timetable_by_program_sem(availability_entries)
 
-            return timetable_entries
+            return availability_entries
 
         except Exception as error:
-            print(f"[ERROR] Failed to fetch timetable: {error}")
-            return self._get_fallback_timetable()
+            print(f"[ERROR] Failed to fetch professor availability: {error}")
+            return self._get_fallback_professor_availability()
 
-    def _get_fallback_timetable(self) -> List[Dict[str, str]]:
+    def _get_fallback_professor_availability(self) -> List[Dict[str, str]]:
         """
-        Return fallback timetable data when Google Sheets is unavailable.
+        Return fallback professor availability data when Google Sheets is unavailable.
 
         Returns:
-            List[Dict]: List of sample timetable dictionaries
+            List[Dict]: List of sample availability dictionaries
         """
         return [
             { 'Tag': 'Montag', 'Zeit': '08:00-10:00', 'Fach': 'Mathematik II', 'Professor': 'Prof. Buhl', 'Raum': 'A101' },
