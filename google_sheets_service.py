@@ -33,6 +33,7 @@ class GoogleSheetsService:
         self.materials_worksheet_name = config.MATERIALS_WORKSHEET_NAME
         self.opportunities_worksheet_name = config.OPPORTUNITIES_WORKSHEET_NAME
         self.professor_availability_worksheet_name = config.PROFESSOR_AVAILABILITY_WORKSHEET_NAME
+        self.users_worksheet_name = config.USERS_WORKSHEET_NAME
         self.google_client = None
         self.current_data_source = self.DATA_SOURCE_UNKNOWN
 
@@ -584,6 +585,121 @@ class GoogleSheetsService:
             { 'Tag': 'Mittwoch', 'Zeit': '14:00-16:00', 'Fach': 'Chemie', 'Professor': 'Prof. Weber', 'Raum': 'Lab 1' },
         ]
 
+    def get_user_by_email(self, email: str) -> Optional[Dict[str, str]]:
+        """
+        Retrieve a user by email from the Users worksheet.
+
+        Args:
+            email: User's email address
+
+        Returns:
+            Dict or None: User dictionary with keys: email, password_hash, name, or None if not found
+        """
+        try:
+            if not self.google_client:
+                if not self.authenticate_with_google():
+                    return None
+
+            if not self.spreadsheet_id:
+                return None
+
+            spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
+
+            try:
+                users_worksheet = spreadsheet.worksheet(self.users_worksheet_name)
+            except Exception:
+                print(f"[WARNING] Users worksheet '{self.users_worksheet_name}' not found")
+                return None
+
+            raw_records = users_worksheet.get_all_records()
+
+            for record in raw_records:
+                user_email = str(record.get('Email', '')).strip().lower()
+                if user_email == email.lower():
+                    return {
+                        'email': user_email,
+                        'password_hash': str(record.get('Password', '')).strip(),
+                        'name': str(record.get('Name', '')).strip(),
+                    }
+
+            return None
+
+        except Exception as error:
+            print(f"[ERROR] Failed to fetch user: {error}")
+            return None
+
+    def create_user(self, email: str, password_hash: str, name: str) -> bool:
+        """
+        Create a new user in the Users worksheet.
+
+        Args:
+            email: User's email address
+            password_hash: Hashed password
+            name: User's full name
+
+        Returns:
+            bool: True if user created successfully, False otherwise
+        """
+        try:
+            if not self.google_client:
+                if not self.authenticate_with_google():
+                    return False
+
+            if not self.spreadsheet_id:
+                return False
+
+            # Update scope to include write permissions
+            required_scopes = [
+                'https://www.googleapis.com/auth/spreadsheets',
+                'https://www.googleapis.com/auth/drive'
+            ]
+
+            credentials_path = self._get_absolute_credentials_path()
+            if not os.path.exists(credentials_path):
+                print(f"[WARNING] Credentials file not found: {credentials_path}")
+                return False
+
+            credentials = Credentials.from_service_account_file(
+                credentials_path,
+                scopes=required_scopes
+            )
+            self.google_client = gspread.authorize(credentials)
+
+            spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
+
+            try:
+                users_worksheet = spreadsheet.worksheet(self.users_worksheet_name)
+            except Exception:
+                # Create the worksheet if it doesn't exist
+                try:
+                    users_worksheet = spreadsheet.add_worksheet(
+                        title=self.users_worksheet_name,
+                        rows=100,
+                        cols=10
+                    )
+                    # Add header row
+                    users_worksheet.append_row(['Email', 'Password', 'Name', 'Created'])
+                except Exception as create_error:
+                    print(f"[ERROR] Failed to create Users worksheet: {create_error}")
+                    return False
+
+            # Check if user already exists
+            if self.get_user_by_email(email):
+                return False
+
+            # Add user to worksheet
+            from datetime import datetime
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            users_worksheet.append_row([email.lower(), password_hash, name, current_time])
+
+            return True
+
+        except Exception as error:
+            print(f"[ERROR] Failed to create user: {error}")
+            return False
+
 
 # Create a singleton instance
 sheets_service = GoogleSheetsService()
+
+

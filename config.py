@@ -28,6 +28,7 @@ class Config:
     MATERIALS_WORKSHEET_NAME = os.getenv('MATERIALS_SHEET_NAME', 'Materials')
     OPPORTUNITIES_WORKSHEET_NAME = os.getenv('OPPORTUNITIES_SHEET_NAME', 'Opportunities')
     PROFESSOR_AVAILABILITY_WORKSHEET_NAME = os.getenv('PROFESSOR_AVAILABILITY_SHEET_NAME', 'Timetable')
+    USERS_WORKSHEET_NAME = os.getenv('USERS_SHEET_NAME', 'Users')
 
     # External URLs for Adding Data
     ADD_MATERIAL_SHEET_URL = "https://docs.google.com/spreadsheets/d/1-bH05NhyJ1WFOcrmX0BtVVuvd4wWX4jx8VB-AYrOdQY/edit?gid=935728683#gid=935728683"

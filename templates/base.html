@@ -26,12 +26,32 @@
       </nav>
 
       <div class="toolbar-tools">
-        <a class="btn small" href="#contribute">Star/Contribute</a>
+        {% if current_user.is_authenticated %}
+          <span class="user-greeting">Hi, {{ current_user.name }}!</span>
+          <a class="btn small" href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+          <a class="btn small" href="{{ url_for('login') }}">Login</a>
+          <a class="btn small btn-primary" href="{{ url_for('register') }}">Register</a>
+        {% endif %}
       </div>
     </div>
   </header>
 
   <main class="site-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages-container">
+          <div class="container">
+            {% for category, message in messages %}
+              <div class="flash-message flash-{{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    {% endwith %}
+
     {% block content %}{% endblock %}
   </main>
 

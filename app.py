@@ -7,9 +7,27 @@ Flask application for UniVerse - A social-academic hub for students.
 Provides courses, materials, and opportunities management.
 """
 from typing import Dict, List
-from flask import Flask, render_template, abort, request
+from flask import Flask, render_template, abort, request, redirect, url_for, flash
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+import bcrypt
 from config import get_config
 from google_sheets_service import sheets_service
+
+
+class User(UserMixin):
+    """User class for Flask-Login."""
+    def __init__(self, email: str, name: str = ''):
+        self.id = email
+        self.email = email
+        self.name = name
+
+    @staticmethod
+    def get(email: str):
+        """Get user by email from Google Sheets."""
+        user_data = sheets_service.get_user_by_email(email)
+        if user_data:
+            return User(user_data['email'], user_data['name'])
+        return None
 
 
 def create_app(config_name: str = None) -> Flask:
@@ -28,6 +46,16 @@ def create_app(config_name: str = None) -> Flask:
     config = get_config(config_name)
     application.config.from_object(config)
 
+    # Initialize Flask-Login
+    login_manager = LoginManager()
+    login_manager.init_app(application)
+    login_manager.login_view = 'login'
+    login_manager.login_message = 'Please log in to access this page.'
+
+    @login_manager.user_loader
+    def load_user(email):
+        return User.get(email)
+
     def get_common_template_context() -> Dict[str, str]:
         """
         Get common context variables used across all templates.
@@ -38,6 +66,7 @@ def create_app(config_name: str = None) -> Flask:
         return {
             'site_name': config.APP_NAME,
             'ga_id': config.GOOGLE_ANALYTICS_ID,
+            'current_user': current_user,
         }
 
     @application.route('/')
@@ -341,6 +370,92 @@ def create_app(config_name: str = None) -> Flask:
                     if q in _normalize_prof_name(_get_professor_name(e)).lower()
                 ]
         return filtered
+
+    @application.route('/login', methods=['GET', 'POST'])
+    def login():
+        """Render login page and handle login form submission."""
+        if current_user.is_authenticated:
+            return redirect(url_for('index'))
+
+        if request.method == 'POST':
+            email = request.form.get('email', '').strip()
+            password = request.form.get('password', '')
+
+            if not email or not password:
+                flash('Please provide both email and password.', 'error')
+                return render_template('login.html', **get_common_template_context())
+
+            # Get user from Google Sheets
+            user_data = sheets_service.get_user_by_email(email)
+
+            if not user_data:
+                flash('Invalid email or password.', 'error')
+                return render_template('login.html', **get_common_template_context())
+
+            # Verify password
+            password_hash = user_data['password_hash']
+            if bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8')):
+                user = User(user_data['email'], user_data['name'])
+                login_user(user)
+                flash(f'Welcome back, {user.name}!', 'success')
+
+                # Redirect to next page or index
+                next_page = request.args.get('next')
+                return redirect(next_page if next_page else url_for('index'))
+            else:
+                flash('Invalid email or password.', 'error')
+
+        return render_template('login.html', **get_common_template_context())
+
+    @application.route('/register', methods=['GET', 'POST'])
+    def register():
+        """Render registration page and handle registration form submission."""
+        if current_user.is_authenticated:
+            return redirect(url_for('index'))
+
+        if request.method == 'POST':
+            name = request.form.get('name', '').strip()
+            email = request.form.get('email', '').strip()
+            password = request.form.get('password', '')
+            confirm_password = request.form.get('confirm_password', '')
+
+            # Validation
+            if not all([name, email, password, confirm_password]):
+                flash('All fields are required.', 'error')
+                return render_template('register.html', **get_common_template_context())
+
+            if password != confirm_password:
+                flash('Passwords do not match.', 'error')
+                return render_template('register.html', **get_common_template_context())
+
+            if len(password) < 6:
+                flash('Password must be at least 6 characters long.', 'error')
+                return render_template('register.html', **get_common_template_context())
+
+            # Check if user already exists
+            if sheets_service.get_user_by_email(email):
+                flash('An account with this email already exists.', 'error')
+                return render_template('register.html', **get_common_template_context())
+
+            # Hash password
+            password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+            # Create user in Google Sheets
+            if sheets_service.create_user(email, password_hash, name):
+                flash('Registration successful! Please log in.', 'success')
+                return redirect(url_for('login'))
+            else:
+                flash('Registration failed. Please try again later.', 'error')
+
+        return render_template('register.html', **get_common_template_context())
+
+    @application.route('/logout')
+    @login_required
+    def logout():
+        """Log out the current user."""
+        logout_user()
+        flash('You have been logged out.', 'info')
+        return redirect(url_for('index'))
 
     return application
 

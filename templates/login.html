@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Login - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="container">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <h1>Welcome Back</h1>
+          <p class="auth-subtitle">Sign in to your {{ site_name }} account</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('login') }}" class="auth-form">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="student@university.edu"
+              required
+              autofocus
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-input"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">
+            Sign In
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Don't have an account? <a href="{{ url_for('register') }}" class="auth-link">Register here</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
