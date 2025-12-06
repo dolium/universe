@@ -4,7 +4,6 @@ This test verifies that each material has unique radio button IDs.
 """
 
 from app import app as flask_app
-from google_sheets_service import sheets_service
 from bs4 import BeautifulSoup
 
 

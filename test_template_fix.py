@@ -136,10 +136,10 @@ def test_old_template_has_bug():
     if len(ids) != len(set(ids)):
         print("✅ Confirmed: Old template HAD duplicate IDs (the bug)")
         # Show the duplicate structure
-        print(f"\nWith 2 materials, the old code generated:")
-        print(f"  Material 0: star1-0, star2-1, star3-2, star4-3, star5-4")
-        print(f"  Material 1: star1-0, star2-1, star3-2, star4-3, star5-4")
-        print(f"           ^ SAME IDs! This caused labels to point to Material 0's inputs")
+        print(f"\nWith 2 materials, the old code generated these IDs:")
+        print(f"  Material 0: {ids[:5]}")
+        print(f"  Material 1: {ids[5:]}")
+        print(f"  Note: IDs are duplicated, causing Material 1's labels to point to Material 0's inputs!")
         return True
     else:
         print("⚠ Unexpected: Old template didn't have duplicates")
