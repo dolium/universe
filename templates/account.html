@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Account - {{ user.name }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="account-page">
+  <div class="container">
+    <h1 style="margin-bottom:20px">{{ user.name }}'s Account</h1>
+    
+    <div class="panel" style="margin-bottom:30px">
+      <h3>Profile Information</h3>
+      <p><strong>Name:</strong> {{ user.name }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+    </div>
+    
+    <div class="panel">
+      <h3>Materials Added by {{ user.name }}</h3>
+      {% if materials and materials|length > 0 %}
+        <p style="margin-bottom:20px">Total materials contributed: <strong>{{ materials|length }}</strong></p>
+        <ul class="resource-list">
+          {% for material in materials %}
+            <li style="margin-bottom:15px">
+              <div>
+                <a href="{{ material.url }}" target="_blank" rel="noopener" style="font-size:16px;font-weight:500">{{ material.title }}</a>
+                <p style="margin:5px 0;color:#888;font-size:14px">
+                  Course: <a href="{{ url_for('course_detail', slug=material.course_slug) }}">{{ material.course_name }}</a>
+                </p>
+                {% if material.rating > 0 %}
+                <p style="margin:5px 0;color:#ffd700;font-size:14px">
+                  {% set full_stars = material.rating|int %}
+                  {% set has_half_star = (material.rating - full_stars) >= 0.5 %}
+                  {% for i in range(full_stars) %}★{% endfor %}{% if has_half_star %}☆{% endif %}
+                  <span style="color:#888">{{ material.rating|round(1) }}/5 ({{ material.rating_count }} ratings)</span>
+                </p>
+                {% else %}
+                <p style="margin:5px 0;color:#888;font-size:14px">No ratings yet</p>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">
+          {% if is_own_account %}
+            You haven't added any materials yet. Visit course pages to share materials with the community!
+          {% else %}
+            This user hasn't added any materials yet.
+          {% endif %}
+        </p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

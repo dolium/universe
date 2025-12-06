@@ -457,6 +457,82 @@ def create_app(config_name: str = None) -> Flask:
         flash('You have been logged out.', 'info')
         return redirect(url_for('index'))
 
+    @application.route('/account')
+    @application.route('/account/<email>')
+    def account(email: str = None):
+        """
+        Render the account page showing user information and their materials.
+        If no email is provided, show the current user's account.
+        """
+        # If no email provided and user is logged in, use their email
+        if email is None:
+            if current_user.is_authenticated:
+                email = current_user.email
+            else:
+                flash('Please log in to view your account.', 'error')
+                return redirect(url_for('login'))
+        
+        # Get user information
+        user_data = sheets_service.get_user_by_email(email)
+        
+        if not user_data:
+            abort(404)
+        
+        # Get materials added by this user
+        user_materials = sheets_service.get_materials_by_author(email)
+        
+        # Get course information for each material
+        all_courses = sheets_service.get_courses()
+        courses_dict = {course['slug']: course for course in all_courses}
+        
+        # Enrich materials with course names
+        for material in user_materials:
+            course_slug = material.get('course_slug')
+            if course_slug in courses_dict:
+                material['course_name'] = courses_dict[course_slug]['name']
+            else:
+                material['course_name'] = 'Unknown Course'
+        
+        template_context = get_common_template_context()
+        template_context.update({
+            'user': user_data,
+            'materials': user_materials,
+            'is_own_account': current_user.is_authenticated and current_user.email.lower() == email.lower()
+        })
+        
+        return render_template('account.html', **template_context)
+
+    @application.route('/rate_material', methods=['POST'])
+    @login_required
+    def rate_material():
+        """Handle material rating submission."""
+        course_slug = request.form.get('course_slug', '').strip()
+        material_title = request.form.get('material_title', '').strip()
+        rating_str = request.form.get('rating', '').strip()
+        
+        if not all([course_slug, material_title, rating_str]):
+            flash('Invalid rating submission.', 'error')
+            return redirect(request.referrer or url_for('courses'))
+        
+        try:
+            rating = float(rating_str)
+            if rating < 1 or rating > 5:
+                flash('Rating must be between 1 and 5 stars.', 'error')
+                return redirect(request.referrer or url_for('courses'))
+        except ValueError:
+            flash('Invalid rating value.', 'error')
+            return redirect(request.referrer or url_for('courses'))
+        
+        # Update the rating
+        success = sheets_service.rate_material(course_slug, material_title, rating)
+        
+        if success:
+            flash('Thank you for rating this material!', 'success')
+        else:
+            flash('Failed to submit rating. Please try again.', 'error')
+        
+        return redirect(request.referrer or url_for('course_detail', slug=course_slug))
+
     return application
 
 
