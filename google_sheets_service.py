@@ -190,7 +190,7 @@ class GoogleSheetsService:
         Fetch all course materials from 'Materials' worksheet.
 
         Returns:
-            List[Dict]: List of material dictionaries with keys: course_slug, title, url
+            List[Dict]: List of material dictionaries with keys: course_slug, title, url, author_email, rating, rating_count
         """
         try:
             # Ensure client is authenticated
@@ -226,10 +226,30 @@ class GoogleSheetsService:
                 if not (course_name and title and url):
                     continue
 
+                # Extract author email and rating information
+                author_email = self._extract_field_value(record, ['Author Email', 'Author', 'Email', 'Added By'])
+                
+                # Parse rating as float, default to 0 if not present or invalid
+                rating_str = self._extract_field_value(record, ['Rating', 'Average Rating', 'Stars'])
+                try:
+                    rating = float(rating_str) if rating_str else 0.0
+                except (ValueError, TypeError):
+                    rating = 0.0
+                
+                # Parse rating count as int, default to 0 if not present or invalid
+                rating_count_str = self._extract_field_value(record, ['Rating Count', 'Ratings', 'Number of Ratings'])
+                try:
+                    rating_count = int(rating_count_str) if rating_count_str else 0
+                except (ValueError, TypeError):
+                    rating_count = 0
+
                 materials.append({
                     'course_slug': self._create_url_slug(course_name),
                     'title': title,
                     'url': url,
+                    'author_email': author_email,
+                    'rating': rating,
+                    'rating_count': rating_count,
                 })
             return materials
 
@@ -256,6 +276,27 @@ class GoogleSheetsService:
             return course_materials
         except Exception as error:
             print(f"[ERROR] Failed to filter materials for course '{course_slug}': {error}")
+            return []
+
+    def get_materials_by_author(self, author_email: str) -> List[Dict[str, str]]:
+        """
+        Get all materials added by a specific author.
+
+        Args:
+            author_email: Email of the author
+
+        Returns:
+            List[Dict]: List of materials added by the specified author
+        """
+        try:
+            all_materials = self.get_materials()
+            author_materials = [
+                material for material in all_materials
+                if material.get('author_email', '').lower() == author_email.lower()
+            ]
+            return author_materials
+        except Exception as error:
+            print(f"[ERROR] Failed to filter materials for author '{author_email}': {error}")
             return []
 
     def get_opportunities(self) -> List[Dict[str, str]]:
@@ -374,9 +415,30 @@ class GoogleSheetsService:
             List[Dict]: List of sample material dictionaries
         """
         return [
-            { 'course_slug': 'mathematics-ii', 'title': 'Exam Cheat Sheet (2024)', 'url': 'https://example.com/maths-cheatsheet.pdf' },
-            { 'course_slug': 'physics-i', 'title': 'Lab Report Template', 'url': 'https://example.com/physics-lab-template.docx' },
-            { 'course_slug': 'computer-science-i', 'title': 'Data Structures Notes', 'url': 'https://example.com/ds-notes' },
+            { 
+                'course_slug': 'mathematics-ii', 
+                'title': 'Exam Cheat Sheet (2024)', 
+                'url': 'https://example.com/maths-cheatsheet.pdf',
+                'author_email': 'student@example.com',
+                'rating': 4.5,
+                'rating_count': 10
+            },
+            { 
+                'course_slug': 'physics-i', 
+                'title': 'Lab Report Template', 
+                'url': 'https://example.com/physics-lab-template.docx',
+                'author_email': 'physics@example.com',
+                'rating': 5.0,
+                'rating_count': 5
+            },
+            { 
+                'course_slug': 'computer-science-i', 
+                'title': 'Data Structures Notes', 
+                'url': 'https://example.com/ds-notes',
+                'author_email': 'cs@example.com',
+                'rating': 3.8,
+                'rating_count': 15
+            },
         ]
 
     def _get_fallback_opportunities(self) -> List[Dict[str, str]]:
@@ -696,6 +758,181 @@ class GoogleSheetsService:
 
         except Exception as error:
             print(f"[ERROR] Failed to create user: {error}")
+            return False
+
+    def _ensure_write_permissions(self) -> bool:
+        """
+        Ensure the Google Sheets client has write permissions.
+        Re-authenticates if necessary with write scopes.
+        
+        Returns:
+            bool: True if client has write permissions, False otherwise
+        """
+        try:
+            # Update scope to include write permissions
+            required_scopes = [
+                'https://www.googleapis.com/auth/spreadsheets',
+                'https://www.googleapis.com/auth/drive'
+            ]
+
+            credentials_path = self._get_absolute_credentials_path()
+            if not os.path.exists(credentials_path):
+                print(f"[WARNING] Credentials file not found: {credentials_path}")
+                return False
+
+            credentials = Credentials.from_service_account_file(
+                credentials_path,
+                scopes=required_scopes
+            )
+            self.google_client = gspread.authorize(credentials)
+            return True
+            
+        except Exception as error:
+            print(f"[ERROR] Failed to ensure write permissions: {error}")
+            return False
+
+    def rate_material(self, course_slug: str, material_title: str, new_rating: float) -> bool:
+        """
+        Update the rating of a material by calculating a new average.
+        
+        Args:
+            course_slug: URL slug of the course
+            material_title: Title of the material to rate
+            new_rating: New rating to add (1-5 stars)
+            
+        Returns:
+            bool: True if rating updated successfully, False otherwise
+        """
+        try:
+            # Ensure we have an authenticated client with write permissions
+            if not self.google_client:
+                if not self.authenticate_with_google():
+                    return False
+            
+            # Ensure write permissions (re-auth if needed)
+            if not self._ensure_write_permissions():
+                return False
+
+            if not self.spreadsheet_id:
+                return False
+
+            spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
+
+            try:
+                materials_worksheet = spreadsheet.worksheet(self.materials_worksheet_name)
+            except Exception:
+                try:
+                    materials_worksheet = spreadsheet.get_worksheet(1)
+                except Exception:
+                    return False
+
+            # Get headers once for column index lookup
+            headers = materials_worksheet.row_values(1)
+            rating_col = None
+            count_col = None
+            course_col = None
+            title_col = None
+            
+            # Find relevant column indices
+            for col_idx, header in enumerate(headers, start=1):
+                if header in ['Rating', 'Average Rating', 'Stars']:
+                    rating_col = col_idx
+                elif header in ['Rating Count', 'Ratings', 'Number of Ratings']:
+                    count_col = col_idx
+                elif header == 'Course':
+                    course_col = col_idx
+                elif header in ['Title', 'Name']:
+                    title_col = col_idx
+            
+            # If we can't find required columns, fall back to full record scan
+            if not (course_col and title_col):
+                raw_records = materials_worksheet.get_all_records()
+                
+                # Find the row with matching course and title
+                for idx, record in enumerate(raw_records, start=2):  # Start at 2 because row 1 is headers
+                    course_name = record.get('Course', '').strip()
+                    title = (record.get('Title', '') or record.get('Name', '')).strip()
+                    
+                    if self._create_url_slug(course_name) == course_slug and title == material_title:
+                        return self._update_material_rating(materials_worksheet, idx, record, 
+                                                           rating_col, count_col, new_rating)
+            else:
+                # More efficient: Use find to locate the cell
+                # Get all values for course and title columns
+                all_values = materials_worksheet.get_all_values()
+                
+                for idx, row in enumerate(all_values[1:], start=2):  # Skip header row
+                    if idx - 1 >= len(row):
+                        continue
+                    
+                    course_name = row[course_col - 1].strip() if course_col <= len(row) else ''
+                    title = row[title_col - 1].strip() if title_col <= len(row) else ''
+                    
+                    if self._create_url_slug(course_name) == course_slug and title == material_title:
+                        # Create a record dict for the helper method
+                        record = {headers[i]: row[i] for i in range(min(len(headers), len(row)))}
+                        return self._update_material_rating(materials_worksheet, idx, record,
+                                                           rating_col, count_col, new_rating)
+            
+            # Material not found
+            return False
+
+        except Exception as error:
+            print(f"[ERROR] Failed to rate material: {error}")
+            return False
+
+    def _update_material_rating(self, worksheet, row_idx: int, record: dict, 
+                               rating_col: int, count_col: int, new_rating: float) -> bool:
+        """
+        Helper method to update rating for a material.
+        
+        Args:
+            worksheet: The worksheet object
+            row_idx: Row index of the material
+            record: Dictionary of the material record
+            rating_col: Column index for rating
+            count_col: Column index for rating count
+            new_rating: New rating to add
+            
+        Returns:
+            bool: True if update successful
+        """
+        try:
+            rating_str = self._extract_field_value(record, ['Rating', 'Average Rating', 'Stars'])
+            rating_count_str = self._extract_field_value(record, ['Rating Count', 'Ratings', 'Number of Ratings'])
+            
+            try:
+                current_rating = float(rating_str) if rating_str else 0.0
+                current_count = int(rating_count_str) if rating_count_str else 0
+            except (ValueError, TypeError):
+                current_rating = 0.0
+                current_count = 0
+            
+            # Calculate new average rating
+            total_rating = (current_rating * current_count) + new_rating
+            new_count = current_count + 1
+            new_average = total_rating / new_count
+            
+            # Update the cells in a single batch request for efficiency
+            updates = []
+            if rating_col:
+                updates.append({
+                    'range': f'{chr(64 + rating_col)}{row_idx}',
+                    'values': [[round(new_average, 2)]]
+                })
+            if count_col:
+                updates.append({
+                    'range': f'{chr(64 + count_col)}{row_idx}',
+                    'values': [[new_count]]
+                })
+            
+            if updates:
+                worksheet.batch_update(updates)
+            
+            return True
+            
+        except Exception as error:
+            print(f"[ERROR] Failed to update material rating: {error}")
             return False
 
 

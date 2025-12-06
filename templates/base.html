@@ -28,6 +28,7 @@
       <div class="toolbar-tools">
         {% if current_user.is_authenticated %}
           <span class="user-greeting">Hi, {{ current_user.name }}!</span>
+          <a class="btn small" href="{{ url_for('account') }}">My Account</a>
           <a class="btn small" href="{{ url_for('logout') }}">Logout</a>
         {% else %}
           <a class="btn small" href="{{ url_for('login') }}">Login</a>

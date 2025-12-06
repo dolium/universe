@@ -72,7 +72,52 @@
         {% if mats and mats|length > 0 %}
           <ul class="resource-list">
             {% for m in mats %}
-              <li><a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.title }}</a></li>
+              <li style="margin-bottom:20px;border-bottom:1px solid #333;padding-bottom:15px">
+                <div>
+                  <a href="{{ m.url }}" target="_blank" rel="noopener" style="font-size:16px;font-weight:500">{{ m.title }}</a>
+                  
+                  {% if m.author_email %}
+                  <p style="margin:5px 0;color:#888;font-size:13px">
+                    Added by: <a href="{{ url_for('account', email=m.author_email) }}">{{ m.author_email }}</a>
+                  </p>
+                  {% endif %}
+                  
+                  {% if m.rating > 0 %}
+                  <p style="margin:5px 0;font-size:14px">
+                    <span style="color:#ffd700">
+                      {% set full_stars = m.rating|int %}
+                      {% set has_half_star = (m.rating - full_stars) >= 0.5 %}
+                      {% set empty_stars = 5 - full_stars - (1 if has_half_star else 0) %}
+                      {% for i in range(full_stars) %}★{% endfor %}
+                      {% if has_half_star %}☆{% endif %}
+                      {% for i in range(empty_stars) %}☆{% endfor %}
+                    </span>
+                    <span style="color:#888">{{ m.rating|round(1) }}/5 ({{ m.rating_count }} ratings)</span>
+                  </p>
+                  {% else %}
+                  <p style="margin:5px 0;color:#888;font-size:13px">No ratings yet</p>
+                  {% endif %}
+                  
+                  {% if current_user.is_authenticated %}
+                  <form method="POST" action="{{ url_for('rate_material') }}" style="margin-top:10px">
+                    <input type="hidden" name="course_slug" value="{{ course.slug }}" />
+                    <input type="hidden" name="material_title" value="{{ m.title }}" />
+                    <label style="font-size:13px;color:#888;margin-right:10px">Rate this material:</label>
+                    <div class="star-rating" style="display:inline-block">
+                      {% for i in range(1, 6) %}
+                        <input type="radio" id="star{{ i }}-{{ loop.index0 }}" name="rating" value="{{ i }}" style="display:none" />
+                        <label for="star{{ i }}-{{ loop.index0 }}" class="star-label" style="cursor:pointer;color:#555;font-size:20px;margin:0 2px">☆</label>
+                      {% endfor %}
+                    </div>
+                    <button type="submit" class="btn small" style="margin-left:10px;padding:4px 12px;font-size:13px">Submit Rating</button>
+                  </form>
+                  {% else %}
+                  <p style="margin-top:10px;font-size:13px;color:#888">
+                    <a href="{{ url_for('login') }}">Log in</a> to rate this material
+                  </p>
+                  {% endif %}
+                </div>
+              </li>
             {% endfor %}
           </ul>
         {% else %}
@@ -82,4 +127,66 @@
     </div>
   </div>
 </section>
+
+<style>
+.star-rating input[type="radio"]:checked ~ label.star-label,
+.star-rating input[type="radio"]:checked + label.star-label {
+  color: #ffd700;
+}
+/* Hover effects are handled by JavaScript for better control */
+</style>
+
+<script>
+// Star rating interactivity
+document.addEventListener('DOMContentLoaded', function() {
+  const starRatings = document.querySelectorAll('.star-rating');
+  starRatings.forEach(function(rating) {
+    const labels = rating.querySelectorAll('.star-label');
+    labels.forEach(function(label, index) {
+      label.addEventListener('click', function() {
+        // Update all previous stars
+        for (let i = 0; i <= index; i++) {
+          labels[i].textContent = '★';
+        }
+        // Clear all following stars
+        for (let i = index + 1; i < labels.length; i++) {
+          labels[i].textContent = '☆';
+        }
+      });
+      
+      label.addEventListener('mouseenter', function() {
+        // Highlight on hover
+        for (let i = 0; i <= index; i++) {
+          labels[i].textContent = '★';
+          labels[i].style.color = '#ffd700';
+        }
+        for (let i = index + 1; i < labels.length; i++) {
+          labels[i].textContent = '☆';
+          labels[i].style.color = '#555';
+        }
+      });
+    });
+    
+    // Reset on mouse leave
+    rating.addEventListener('mouseleave', function() {
+      const checked = rating.querySelector('input[type="radio"]:checked');
+      labels.forEach(function(label, index) {
+        if (checked) {
+          const checkedValue = parseInt(checked.value);
+          if (index < checkedValue) {
+            label.textContent = '★';
+            label.style.color = '#ffd700';
+          } else {
+            label.textContent = '☆';
+            label.style.color = '#555';
+          }
+        } else {
+          label.textContent = '☆';
+          label.style.color = '#555';
+        }
+      });
+    });
+  });
+});
+</script>
 {% endblock %}

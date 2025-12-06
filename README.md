@@ -8,6 +8,11 @@ A Flask-based educational platform with dynamic course management via Google She
 - 📊 Dynamic course loading from Google Sheets
 - 🚀 Fast and responsive interface
 - 📱 Mobile-friendly design
+- 👤 User authentication and account management
+- 📚 Material sharing with authorship tracking
+- ⭐ Material rating system (1-5 stars)
+- 👥 User account pages showing contributions
+- 🔒 Secure password hashing with bcrypt
 
 ## Quick Start
 
@@ -41,31 +46,47 @@ Edit `.env` and configure:
 
 ### 3. Google Sheets Setup (Optional)
 
-If you want to manage courses via Google Sheets:
+If you want to manage courses and materials via Google Sheets:
 
 1. Create a Google Cloud Project and enable Google Sheets API
 2. Create a Service Account and download credentials as JSON
 3. Save the credentials file as `credentials.json` in the project root
-4. Create a Google Sheet with the following columns:
+4. Create a Google Sheet with multiple worksheets:
+
+#### Courses Worksheet (Tab 1)
    - **Course**: Course name (e.g., "Mathematics II")
    - **Professor**: Professor name (e.g., "Prof. Buhl")
    - **Description**: Course description
    - **Icon**: Icon identifier (math, physics, chemistry, biology, cs, engineering, or default)
-5. Share the Google Sheet with the service account email (found in credentials.json)
+   - **Study Programme**: Program name (optional)
+
+#### Materials Worksheet (Tab 2)
+   - **Course**: Course name (must match a course from Tab 1)
+   - **Title**: Material title (e.g., "Exam Cheat Sheet 2024")
+   - **URL**: Link to the material
+   - **Author Email**: Email of person who added it (optional)
+   - **Rating**: Average rating 0-5 (optional, auto-updated)
+   - **Rating Count**: Number of ratings (optional, auto-updated)
+
+#### Users Worksheet (Tab 4)
+   - Created automatically when users register
+   - **Email**: User email address
+   - **Password**: Hashed password
+   - **Name**: User's full name
+   - **Created**: Timestamp
+
+5. Share the Google Sheet with the service account email (found in credentials.json) with **Editor** permissions
 6. Copy the Sheet ID from the URL and add it to `.env`
+
+For detailed setup instructions, see:
+- [GOOGLE_SHEETS_SETUP.md](GOOGLE_SHEETS_SETUP.md) - General Google Sheets setup
+- [MATERIALS_SHEET_SETUP.md](MATERIALS_SHEET_SETUP.md) - Materials sheet structure and rating system
+- [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md) - User authentication setup
 
 **Google Sheet URL Format:**
 ```
 https://docs.google.com/spreadsheets/d/[SHEET_ID]/edit
 ```
-
-**Example Google Sheet Structure:**
-
-| Course | Professor | Description | Icon |
-|--------|-----------|-------------|------|
-| Mathematics II | Prof. Buhl | Advanced calculus and linear algebra | math |
-| Physics I | Prof. Schmidt | Classical mechanics and thermodynamics | physics |
-| Chemistry Fundamentals | Prof. Weber | Organic and inorganic chemistry | chemistry |
 
 **Note:** If Google Sheets is not configured, the app will use dummy data as fallback.
 
@@ -83,6 +104,7 @@ Visit `http://localhost:5000` in your browser.
 .
 ├── app.py                      # Main Flask application
 ├── google_sheets_service.py    # Google Sheets integration
+├── config.py                   # Configuration management
 ├── requirements.txt            # Python dependencies
 ├── .env                        # Environment configuration
 ├── static/
@@ -94,8 +116,30 @@ Visit `http://localhost:5000` in your browser.
 └── templates/
     ├── base.html              # Base template
     ├── index.html             # Homepage
-    └── courses.html           # Courses page (dynamic)
+    ├── courses.html           # Courses listing page
+    ├── course_detail.html     # Individual course page with materials
+    ├── opportunities.html     # Opportunities page
+    ├── timetable.html         # Professor availability
+    ├── login.html             # Login page
+    ├── register.html          # Registration page
+    └── account.html           # User account page
 ```
+
+## User Features
+
+### For Students
+- **Browse Courses**: View all available courses with filtering by study programme
+- **Access Materials**: Find study materials, cheat sheets, notes, and templates
+- **Rate Materials**: Give 1-5 star ratings to materials (requires login)
+- **Share Materials**: Add your own materials via Google Forms (linked on course pages)
+- **View Contributions**: See all materials you've added on your account page
+- **User Profiles**: Click on any author's email to see their contributions
+
+### For Administrators
+- **Dynamic Content**: Manage courses, materials, and opportunities via Google Sheets
+- **No Code Changes**: Add/update content without deploying code
+- **User Management**: Track registered users in the Users worksheet
+- **Analytics Ready**: Google Analytics integration available
 
 ## Development
 
