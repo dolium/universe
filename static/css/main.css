@@ -13,6 +13,7 @@
   --color-text-primary: #e6e6e6;
   --color-text-muted: #a0a0a0;
   --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
   --color-primary-contrast: #ffffff;
 
   /* Spacing & Layout */
@@ -120,7 +121,7 @@ body {
 }
 
 .btn:hover {
-  background: #4338ca;
+  background: var(--color-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -130,13 +131,12 @@ body {
 }
 
 .btn-primary {
-  background: var(--color-primary);
-  color: var(--color-primary-contrast);
-  border: none;
+  /* Now redundant - all buttons use primary styling by default */
+  /* Kept for backward compatibility */
 }
 
 .btn-primary:hover {
-  background: #4338ca;
+  /* Inherits from .btn:hover */
 }
 
 .btn.btn-ok-dark {
