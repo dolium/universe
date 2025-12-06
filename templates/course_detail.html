@@ -87,7 +87,10 @@
                     <span style="color:#ffd700">
                       {% set full_stars = m.rating|int %}
                       {% set has_half_star = (m.rating - full_stars) >= 0.5 %}
-                      {% for i in range(full_stars) %}★{% endfor %}{% if has_half_star %}☆{% endif %}{% for i in range(5 - full_stars - (1 if has_half_star else 0)) %}☆{% endfor %}
+                      {% set empty_stars = 5 - full_stars - (1 if has_half_star else 0) %}
+                      {% for i in range(full_stars) %}★{% endfor %}
+                      {% if has_half_star %}☆{% endif %}
+                      {% for i in range(empty_stars) %}☆{% endfor %}
                     </span>
                     <span style="color:#888">{{ m.rating|round(1) }}/5 ({{ m.rating_count }} ratings)</span>
                   </p>
@@ -130,10 +133,7 @@
 .star-rating input[type="radio"]:checked + label.star-label {
   color: #ffd700;
 }
-.star-rating label.star-label:hover,
-.star-rating label.star-label:hover ~ label.star-label {
-  color: #ffd700;
-}
+/* Hover effects are handled by JavaScript for better control */
 </style>
 
 <script>

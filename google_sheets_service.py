@@ -760,26 +760,15 @@ class GoogleSheetsService:
             print(f"[ERROR] Failed to create user: {error}")
             return False
 
-    def rate_material(self, course_slug: str, material_title: str, new_rating: float) -> bool:
+    def _ensure_write_permissions(self) -> bool:
         """
-        Update the rating of a material by calculating a new average.
+        Ensure the Google Sheets client has write permissions.
+        Re-authenticates if necessary with write scopes.
         
-        Args:
-            course_slug: URL slug of the course
-            material_title: Title of the material to rate
-            new_rating: New rating to add (1-5 stars)
-            
         Returns:
-            bool: True if rating updated successfully, False otherwise
+            bool: True if client has write permissions, False otherwise
         """
         try:
-            if not self.google_client:
-                if not self.authenticate_with_google():
-                    return False
-
-            if not self.spreadsheet_id:
-                return False
-
             # Update scope to include write permissions
             required_scopes = [
                 'https://www.googleapis.com/auth/spreadsheets',
@@ -796,6 +785,36 @@ class GoogleSheetsService:
                 scopes=required_scopes
             )
             self.google_client = gspread.authorize(credentials)
+            return True
+            
+        except Exception as error:
+            print(f"[ERROR] Failed to ensure write permissions: {error}")
+            return False
+
+    def rate_material(self, course_slug: str, material_title: str, new_rating: float) -> bool:
+        """
+        Update the rating of a material by calculating a new average.
+        
+        Args:
+            course_slug: URL slug of the course
+            material_title: Title of the material to rate
+            new_rating: New rating to add (1-5 stars)
+            
+        Returns:
+            bool: True if rating updated successfully, False otherwise
+        """
+        try:
+            # Ensure we have an authenticated client with write permissions
+            if not self.google_client:
+                if not self.authenticate_with_google():
+                    return False
+            
+            # Ensure write permissions (re-auth if needed)
+            if not self._ensure_write_permissions():
+                return False
+
+            if not self.spreadsheet_id:
+                return False
 
             spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
 
@@ -807,55 +826,113 @@ class GoogleSheetsService:
                 except Exception:
                     return False
 
-            # Get all records to find the material
-            raw_records = materials_worksheet.get_all_records()
+            # Get headers once for column index lookup
+            headers = materials_worksheet.row_values(1)
+            rating_col = None
+            count_col = None
+            course_col = None
+            title_col = None
             
-            # Find the row with matching course and title
-            for idx, record in enumerate(raw_records, start=2):  # Start at 2 because row 1 is headers
-                course_name = record.get('Course', '').strip()
-                title = (record.get('Title', '') or record.get('Name', '')).strip()
+            # Find relevant column indices
+            for col_idx, header in enumerate(headers, start=1):
+                if header in ['Rating', 'Average Rating', 'Stars']:
+                    rating_col = col_idx
+                elif header in ['Rating Count', 'Ratings', 'Number of Ratings']:
+                    count_col = col_idx
+                elif header == 'Course':
+                    course_col = col_idx
+                elif header in ['Title', 'Name']:
+                    title_col = col_idx
+            
+            # If we can't find required columns, fall back to full record scan
+            if not (course_col and title_col):
+                raw_records = materials_worksheet.get_all_records()
                 
-                if self._create_url_slug(course_name) == course_slug and title == material_title:
-                    # Found the material - update its rating
-                    rating_str = self._extract_field_value(record, ['Rating', 'Average Rating', 'Stars'])
-                    rating_count_str = self._extract_field_value(record, ['Rating Count', 'Ratings', 'Number of Ratings'])
+                # Find the row with matching course and title
+                for idx, record in enumerate(raw_records, start=2):  # Start at 2 because row 1 is headers
+                    course_name = record.get('Course', '').strip()
+                    title = (record.get('Title', '') or record.get('Name', '')).strip()
                     
-                    try:
-                        current_rating = float(rating_str) if rating_str else 0.0
-                        current_count = int(rating_count_str) if rating_count_str else 0
-                    except (ValueError, TypeError):
-                        current_rating = 0.0
-                        current_count = 0
+                    if self._create_url_slug(course_name) == course_slug and title == material_title:
+                        return self._update_material_rating(materials_worksheet, idx, record, 
+                                                           rating_col, count_col, new_rating)
+            else:
+                # More efficient: Use find to locate the cell
+                # Get all values for course and title columns
+                all_values = materials_worksheet.get_all_values()
+                
+                for idx, row in enumerate(all_values[1:], start=2):  # Skip header row
+                    if idx - 1 >= len(row):
+                        continue
                     
-                    # Calculate new average rating
-                    total_rating = (current_rating * current_count) + new_rating
-                    new_count = current_count + 1
-                    new_average = total_rating / new_count
+                    course_name = row[course_col - 1].strip() if course_col <= len(row) else ''
+                    title = row[title_col - 1].strip() if title_col <= len(row) else ''
                     
-                    # Find the column indices for Rating and Rating Count
-                    headers = materials_worksheet.row_values(1)
-                    rating_col = None
-                    count_col = None
-                    
-                    for col_idx, header in enumerate(headers, start=1):
-                        if header in ['Rating', 'Average Rating', 'Stars']:
-                            rating_col = col_idx
-                        elif header in ['Rating Count', 'Ratings', 'Number of Ratings']:
-                            count_col = col_idx
-                    
-                    # Update the cells
-                    if rating_col:
-                        materials_worksheet.update_cell(idx, rating_col, round(new_average, 2))
-                    if count_col:
-                        materials_worksheet.update_cell(idx, count_col, new_count)
-                    
-                    return True
+                    if self._create_url_slug(course_name) == course_slug and title == material_title:
+                        # Create a record dict for the helper method
+                        record = {headers[i]: row[i] for i in range(min(len(headers), len(row)))}
+                        return self._update_material_rating(materials_worksheet, idx, record,
+                                                           rating_col, count_col, new_rating)
             
             # Material not found
             return False
 
         except Exception as error:
             print(f"[ERROR] Failed to rate material: {error}")
+            return False
+
+    def _update_material_rating(self, worksheet, row_idx: int, record: dict, 
+                               rating_col: int, count_col: int, new_rating: float) -> bool:
+        """
+        Helper method to update rating for a material.
+        
+        Args:
+            worksheet: The worksheet object
+            row_idx: Row index of the material
+            record: Dictionary of the material record
+            rating_col: Column index for rating
+            count_col: Column index for rating count
+            new_rating: New rating to add
+            
+        Returns:
+            bool: True if update successful
+        """
+        try:
+            rating_str = self._extract_field_value(record, ['Rating', 'Average Rating', 'Stars'])
+            rating_count_str = self._extract_field_value(record, ['Rating Count', 'Ratings', 'Number of Ratings'])
+            
+            try:
+                current_rating = float(rating_str) if rating_str else 0.0
+                current_count = int(rating_count_str) if rating_count_str else 0
+            except (ValueError, TypeError):
+                current_rating = 0.0
+                current_count = 0
+            
+            # Calculate new average rating
+            total_rating = (current_rating * current_count) + new_rating
+            new_count = current_count + 1
+            new_average = total_rating / new_count
+            
+            # Update the cells in a single batch request for efficiency
+            updates = []
+            if rating_col:
+                updates.append({
+                    'range': f'{chr(64 + rating_col)}{row_idx}',
+                    'values': [[round(new_average, 2)]]
+                })
+            if count_col:
+                updates.append({
+                    'range': f'{chr(64 + count_col)}{row_idx}',
+                    'values': [[new_count]]
+                })
+            
+            if updates:
+                worksheet.batch_update(updates)
+            
+            return True
+            
+        except Exception as error:
+            print(f"[ERROR] Failed to update material rating: {error}")
             return False
 
 
