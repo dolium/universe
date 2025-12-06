@@ -436,7 +436,7 @@ class GoogleSheetsService:
                 'author_email': 'physics@example.com',
                 'rating': 5.0,
                 'rating_count': 5,
-                'verified': False
+                'verified': True
             },
             { 
                 'course_slug': 'computer-science-i', 
