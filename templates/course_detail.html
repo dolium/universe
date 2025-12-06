@@ -72,6 +72,7 @@
         {% if mats and mats|length > 0 %}
           <ul class="resource-list">
             {% for m in mats %}
+              {% set material_index = loop.index0 %}
               <li style="margin-bottom:20px;border-bottom:1px solid #333;padding-bottom:15px">
                 <div>
                   <a href="{{ m.url }}" target="_blank" rel="noopener" style="font-size:16px;font-weight:500">{{ m.title }}</a>
@@ -105,8 +106,8 @@
                     <label style="font-size:13px;color:#888;margin-right:10px">Rate this material:</label>
                     <div class="star-rating" style="display:inline-block">
                       {% for i in range(1, 6) %}
-                        <input type="radio" id="star{{ i }}-{{ loop.index0 }}" name="rating" value="{{ i }}" style="display:none" />
-                        <label for="star{{ i }}-{{ loop.index0 }}" class="star-label" style="cursor:pointer;color:#555;font-size:20px;margin:0 2px">☆</label>
+                        <input type="radio" id="star{{ i }}-{{ material_index }}" name="rating" value="{{ i }}" style="display:none" />
+                        <label for="star{{ i }}-{{ material_index }}" class="star-label" style="cursor:pointer;color:#555;font-size:20px;margin:0 2px">☆</label>
                       {% endfor %}
                     </div>
                     <button type="submit" class="btn small" style="margin-left:10px;padding:4px 12px;font-size:13px">Submit Rating</button>
