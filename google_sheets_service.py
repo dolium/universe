@@ -242,6 +242,10 @@ class GoogleSheetsService:
                     rating_count = int(rating_count_str) if rating_count_str else 0
                 except (ValueError, TypeError):
                     rating_count = 0
+                
+                # Extract verified status
+                verified_str = self._extract_field_value(record, ['Verified', 'Official', 'Officially Verified'])
+                verified = verified_str.lower() in ['true', 'yes', '1', 'verified'] if verified_str else False
 
                 materials.append({
                     'course_slug': self._create_url_slug(course_name),
@@ -250,6 +254,7 @@ class GoogleSheetsService:
                     'author_email': author_email,
                     'rating': rating,
                     'rating_count': rating_count,
+                    'verified': verified,
                 })
             return materials
 
@@ -421,7 +426,8 @@ class GoogleSheetsService:
                 'url': 'https://example.com/maths-cheatsheet.pdf',
                 'author_email': 'student@example.com',
                 'rating': 4.5,
-                'rating_count': 10
+                'rating_count': 10,
+                'verified': False
             },
             { 
                 'course_slug': 'physics-i', 
@@ -429,7 +435,8 @@ class GoogleSheetsService:
                 'url': 'https://example.com/physics-lab-template.docx',
                 'author_email': 'physics@example.com',
                 'rating': 5.0,
-                'rating_count': 5
+                'rating_count': 5,
+                'verified': True
             },
             { 
                 'course_slug': 'computer-science-i', 
@@ -437,7 +444,8 @@ class GoogleSheetsService:
                 'url': 'https://example.com/ds-notes',
                 'author_email': 'cs@example.com',
                 'rating': 3.8,
-                'rating_count': 15
+                'rating_count': 15,
+                'verified': False
             },
         ]
 
@@ -933,6 +941,88 @@ class GoogleSheetsService:
             
         except Exception as error:
             print(f"[ERROR] Failed to update material rating: {error}")
+            return False
+
+    def verify_material(self, course_slug: str, material_title: str, verified: bool) -> bool:
+        """
+        Set the verification status of a material.
+        
+        Args:
+            course_slug: URL slug of the course
+            material_title: Title of the material to verify
+            verified: True to verify, False to unverify
+            
+        Returns:
+            bool: True if verification updated successfully, False otherwise
+        """
+        try:
+            # Ensure we have an authenticated client with write permissions
+            if not self.google_client:
+                if not self.authenticate_with_google():
+                    return False
+            
+            # Ensure write permissions (re-auth if needed)
+            if not self._ensure_write_permissions():
+                return False
+
+            if not self.spreadsheet_id:
+                return False
+
+            spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
+
+            try:
+                materials_worksheet = spreadsheet.worksheet(self.materials_worksheet_name)
+            except Exception:
+                try:
+                    materials_worksheet = spreadsheet.get_worksheet(1)
+                except Exception:
+                    return False
+
+            # Get headers once for column index lookup
+            headers = materials_worksheet.row_values(1)
+            verified_col = None
+            course_col = None
+            title_col = None
+            
+            # Find relevant column indices
+            for col_idx, header in enumerate(headers, start=1):
+                if header in ['Verified', 'Official', 'Officially Verified']:
+                    verified_col = col_idx
+                elif header == 'Course':
+                    course_col = col_idx
+                elif header in ['Title', 'Name']:
+                    title_col = col_idx
+            
+            # If verified column doesn't exist, we need to add it
+            if not verified_col:
+                # Add the Verified column header
+                verified_col = len(headers) + 1
+                materials_worksheet.update_cell(1, verified_col, 'Verified')
+            
+            # Get all values to find the material
+            all_values = materials_worksheet.get_all_values()
+            
+            for idx, row in enumerate(all_values[1:], start=2):  # Skip header row
+                if idx - 1 >= len(all_values):
+                    continue
+                
+                row = all_values[idx - 1]
+                if not row or len(row) < max(course_col or 0, title_col or 0):
+                    continue
+                
+                course_name = row[course_col - 1].strip() if course_col and course_col <= len(row) else ''
+                title = row[title_col - 1].strip() if title_col and title_col <= len(row) else ''
+                
+                if self._create_url_slug(course_name) == course_slug and title == material_title:
+                    # Update the verified status
+                    materials_worksheet.update_cell(idx, verified_col, 'TRUE' if verified else 'FALSE')
+                    return True
+            
+            # Material not found
+            return False
+
+        except Exception as error:
+            print(f"[ERROR] Failed to verify material: {error}")
             return False
 
 

@@ -11,6 +11,7 @@ A Flask-based educational platform with dynamic course management via Google She
 - 👤 User authentication and account management
 - 📚 Material sharing with authorship tracking
 - ⭐ Material rating system (1-5 stars)
+- ✅ Official verification for materials (configurable authorized user)
 - 👥 User account pages showing contributions
 - 🔒 Secure password hashing with bcrypt
 
@@ -67,6 +68,7 @@ If you want to manage courses and materials via Google Sheets:
    - **Author Email**: Email of person who added it (optional)
    - **Rating**: Average rating 0-5 (optional, auto-updated)
    - **Rating Count**: Number of ratings (optional, auto-updated)
+   - **Verified**: Verification status TRUE/FALSE (optional, managed by authorized users)
 
 #### Users Worksheet (Tab 4)
    - Created automatically when users register
@@ -139,7 +141,21 @@ Visit `http://localhost:5000` in your browser.
 - **Dynamic Content**: Manage courses, materials, and opportunities via Google Sheets
 - **No Code Changes**: Add/update content without deploying code
 - **User Management**: Track registered users in the Users worksheet
+- **Verify Materials**: Authorized users can officially verify materials (configurable via `VERIFICATION_EMAIL` in .env)
 - **Analytics Ready**: Google Analytics integration available
+
+## Material Verification
+
+The platform includes an official verification system for materials:
+
+- **Verification Badge**: Verified materials display a checkmark (✓) badge in a violet circle
+- **Authorization**: Only the email specified in `VERIFICATION_EMAIL` (defaults to as.dolium@gmail.com) can verify materials
+- **How to Verify**: 
+  1. Log in with the authorized email
+  2. Navigate to any course page with materials
+  3. Click "Verify Material" button next to any material
+  4. The verification badge will appear immediately
+- **Configuration**: Set `VERIFICATION_EMAIL=your-email@example.com` in .env to change the authorized user
 
 ## Development
 

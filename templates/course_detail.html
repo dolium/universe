@@ -75,7 +75,12 @@
               {% set material_index = loop.index0 %}
               <li style="margin-bottom:20px;border-bottom:1px solid #333;padding-bottom:15px">
                 <div>
-                  <a href="{{ m.url }}" target="_blank" rel="noopener" style="font-size:16px;font-weight:500">{{ m.title }}</a>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <a href="{{ m.url }}" target="_blank" rel="noopener" style="font-size:16px;font-weight:500">{{ m.title }}</a>
+                    {% if m.verified %}
+                    <span class="verified-badge" title="Officially Verified" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#4f46e5;border-radius:50%;color:#fff;font-size:11px;font-weight:bold">✓</span>
+                    {% endif %}
+                  </div>
                   
                   {% if m.author_email %}
                   <p style="margin:5px 0;color:#888;font-size:13px">
@@ -104,14 +109,28 @@
                     <input type="hidden" name="course_slug" value="{{ course.slug }}" />
                     <input type="hidden" name="material_title" value="{{ m.title }}" />
                     <label style="font-size:13px;color:#888;margin-right:10px">Rate this material:</label>
-                    <div class="star-rating" style="display:inline-block">
+                    <div class="star-rating" style="display:inline-block" data-material-index="{{ loop.index0 }}">
                       {% for i in range(1, 6) %}
-                        <input type="radio" id="star{{ i }}-{{ material_index }}" name="rating" value="{{ i }}" style="display:none" />
-                        <label for="star{{ i }}-{{ material_index }}" class="star-label" style="cursor:pointer;color:#555;font-size:20px;margin:0 2px">☆</label>
+                        <input type="radio" id="star{{ i }}-material{{ loop.parent.loop.index0 }}" name="rating" value="{{ i }}" style="display:none" />
+                        <label for="star{{ i }}-material{{ loop.parent.loop.index0 }}" class="star-label" style="cursor:pointer;color:#555;font-size:20px;margin:0 2px">☆</label>
                       {% endfor %}
                     </div>
                     <button type="submit" class="btn small" style="margin-left:10px;padding:4px 12px;font-size:13px">Submit Rating</button>
                   </form>
+                  
+                  {% if current_user.email.lower() == verification_email.lower() %}
+                  <form method="POST" action="{{ url_for('verify_material') }}" style="margin-top:10px">
+                    <input type="hidden" name="course_slug" value="{{ course.slug }}" />
+                    <input type="hidden" name="material_title" value="{{ m.title }}" />
+                    {% if m.verified %}
+                    <input type="hidden" name="action" value="unverify" />
+                    <button type="submit" class="btn small" style="padding:4px 12px;font-size:13px;background:#666">Remove Verification</button>
+                    {% else %}
+                    <input type="hidden" name="action" value="verify" />
+                    <button type="submit" class="btn small" style="padding:4px 12px;font-size:13px">Verify Material</button>
+                    {% endif %}
+                  </form>
+                  {% endif %}
                   {% else %}
                   <p style="margin-top:10px;font-size:13px;color:#888">
                     <a href="{{ url_for('login') }}">Log in</a> to rate this material

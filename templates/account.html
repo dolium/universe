@@ -21,7 +21,12 @@
           {% for material in materials %}
             <li style="margin-bottom:15px">
               <div>
-                <a href="{{ material.url }}" target="_blank" rel="noopener" style="font-size:16px;font-weight:500">{{ material.title }}</a>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <a href="{{ material.url }}" target="_blank" rel="noopener" style="font-size:16px;font-weight:500">{{ material.title }}</a>
+                  {% if material.verified %}
+                  <span class="verified-badge" title="Officially Verified" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:#4f46e5;border-radius:50%;color:#fff;font-size:10px;font-weight:bold">✓</span>
+                  {% endif %}
+                </div>
                 <p style="margin:5px 0;color:#888;font-size:14px">
                   Course: <a href="{{ url_for('course_detail', slug=material.course_slug) }}">{{ material.course_name }}</a>
                 </p>

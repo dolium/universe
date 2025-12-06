@@ -67,6 +67,7 @@ def create_app(config_name: str = None) -> Flask:
             'site_name': config.APP_NAME,
             'ga_id': config.GOOGLE_ANALYTICS_ID,
             'current_user': current_user,
+            'verification_email': config.VERIFICATION_EMAIL,
         }
 
     @application.route('/')
@@ -530,6 +531,38 @@ def create_app(config_name: str = None) -> Flask:
             flash('Thank you for rating this material!', 'success')
         else:
             flash('Failed to submit rating. Please try again.', 'error')
+        
+        return redirect(request.referrer or url_for('course_detail', slug=course_slug))
+
+    @application.route('/verify_material', methods=['POST'])
+    @login_required
+    def verify_material():
+        """Handle material verification (only for authorized users)."""
+        # Check if user is authorized to verify materials
+        if current_user.email.lower() != config.VERIFICATION_EMAIL.lower():
+            flash('You do not have permission to verify materials.', 'error')
+            return redirect(request.referrer or url_for('courses'))
+        
+        course_slug = request.form.get('course_slug', '').strip()
+        material_title = request.form.get('material_title', '').strip()
+        action = request.form.get('action', '').strip()
+        
+        if not all([course_slug, material_title, action]):
+            flash('Invalid verification request.', 'error')
+            return redirect(request.referrer or url_for('courses'))
+        
+        verified = (action == 'verify')
+        
+        # Update the verification status
+        success = sheets_service.verify_material(course_slug, material_title, verified)
+        
+        if success:
+            if verified:
+                flash('Material has been officially verified!', 'success')
+            else:
+                flash('Material verification has been removed.', 'success')
+        else:
+            flash('Failed to update verification status. Please try again.', 'error')
         
         return redirect(request.referrer or url_for('course_detail', slug=course_slug))
 
