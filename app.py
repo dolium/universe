@@ -67,6 +67,7 @@ def create_app(config_name: str = None) -> Flask:
             'site_name': config.APP_NAME,
             'ga_id': config.GOOGLE_ANALYTICS_ID,
             'current_user': current_user,
+            'verification_email': config.VERIFICATION_EMAIL,
         }
 
     @application.route('/')
@@ -536,9 +537,9 @@ def create_app(config_name: str = None) -> Flask:
     @application.route('/verify_material', methods=['POST'])
     @login_required
     def verify_material():
-        """Handle material verification (only for as.dolium@gmail.com)."""
+        """Handle material verification (only for authorized users)."""
         # Check if user is authorized to verify materials
-        if current_user.email.lower() != 'as.dolium@gmail.com':
+        if current_user.email.lower() != config.VERIFICATION_EMAIL.lower():
             flash('You do not have permission to verify materials.', 'error')
             return redirect(request.referrer or url_for('courses'))
         

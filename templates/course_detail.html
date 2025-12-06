@@ -117,7 +117,7 @@
                     <button type="submit" class="btn small" style="margin-left:10px;padding:4px 12px;font-size:13px">Submit Rating</button>
                   </form>
                   
-                  {% if current_user.email.lower() == 'as.dolium@gmail.com' %}
+                  {% if current_user.email.lower() == verification_email.lower() %}
                   <form method="POST" action="{{ url_for('verify_material') }}" style="margin-top:10px">
                     <input type="hidden" name="course_slug" value="{{ course.slug }}" />
                     <input type="hidden" name="material_title" value="{{ m.title }}" />

@@ -1003,7 +1003,11 @@ class GoogleSheetsService:
             all_values = materials_worksheet.get_all_values()
             
             for idx, row in enumerate(all_values[1:], start=2):  # Skip header row
-                if idx - 1 >= len(row):
+                if idx - 1 >= len(all_values):
+                    continue
+                
+                row = all_values[idx - 1]
+                if not row or len(row) < max(course_col or 0, title_col or 0):
                     continue
                 
                 course_name = row[course_col - 1].strip() if course_col and course_col <= len(row) else ''

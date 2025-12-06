@@ -33,6 +33,9 @@ class Config:
     # External URLs for Adding Data
     ADD_MATERIAL_SHEET_URL = "https://docs.google.com/spreadsheets/d/1-bH05NhyJ1WFOcrmX0BtVVuvd4wWX4jx8VB-AYrOdQY/edit?gid=935728683#gid=935728683"
     ADD_OPPORTUNITY_SHEET_URL = "https://docs.google.com/spreadsheets/d/1-bH05NhyJ1WFOcrmX0BtVVuvd4wWX4jx8VB-AYrOdQY/edit?gid=998865460#gid=998865460"
+    
+    # Verification Settings
+    VERIFICATION_EMAIL = os.getenv('VERIFICATION_EMAIL', 'as.dolium@gmail.com')
 
 
 class DevelopmentConfig(Config):
