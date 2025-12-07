@@ -136,6 +136,50 @@
                     <a href="{{ url_for('login') }}">Log in</a> to rate this material
                   </p>
                   {% endif %}
+                  
+                  <!-- Comments Section for Material -->
+                  <div class="material-comments" style="margin-top:20px;padding-top:15px;border-top:1px solid #444">
+                    <h4 style="font-size:15px;margin-bottom:10px">Comments</h4>
+                    
+                    <!-- Add Comment Form (only for logged-in users) -->
+                    {% if current_user.is_authenticated %}
+                      <form method="post" action="{{ url_for('add_comment') }}" style="margin-bottom:15px">
+                        <input type="hidden" name="comment_type" value="material" />
+                        <input type="hidden" name="reference_id" value="{{ course.slug }}:{{ m.title }}" />
+                        <div style="margin-bottom:10px">
+                          <textarea 
+                            name="comment_text" 
+                            required
+                            rows="2"
+                            placeholder="Add a comment about this material..."
+                            style="width:100%;padding:8px;border:1px solid #444;border-radius:5px;background:#1a1a1a;color:#fff;font-size:13px;resize:vertical"
+                          ></textarea>
+                        </div>
+                        <button type="submit" class="btn small" style="padding:4px 12px;font-size:13px">Post Comment</button>
+                      </form>
+                    {% else %}
+                      <p style="margin-bottom:10px;font-size:13px;color:#888">
+                        <a href="{{ url_for('login') }}">Log in</a> to leave a comment
+                      </p>
+                    {% endif %}
+                    
+                    <!-- Display Comments -->
+                    {% if m.comments and m.comments|length > 0 %}
+                      <div class="comments-list">
+                        {% for comment in m.comments %}
+                          <div class="comment" style="padding:10px;margin-bottom:8px;background:#2a2a2a;border-radius:5px;font-size:13px">
+                            <div style="margin-bottom:5px">
+                              <strong style="color:#667eea">{{ comment.author_name }}</strong>
+                              <span style="color:#888;font-size:12px;margin-left:8px">{{ comment.created }}</span>
+                            </div>
+                            <p style="margin:0;color:#ddd;line-height:1.5">{{ comment.comment }}</p>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      <p style="font-size:13px;color:#888">No comments yet.</p>
+                    {% endif %}
+                  </div>
                 </div>
               </li>
             {% endfor %}
