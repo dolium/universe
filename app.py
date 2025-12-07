@@ -618,7 +618,7 @@ def create_app(config_name: str = None) -> Flask:
         if search_query:
             filtered_users = [
                 user for user in all_users
-                if search_query in user['name'].lower() or search_query in user['email'].lower()
+                if search_query in (user.get('name') or '').lower() or search_query in (user.get('email') or '').lower()
             ]
         else:
             filtered_users = all_users

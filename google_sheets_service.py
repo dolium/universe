@@ -1,5 +1,6 @@
 import os
 import re
+from datetime import datetime
 from typing import List, Dict, Optional
 import gspread
 from google.oauth2.service_account import Credentials
@@ -759,7 +760,6 @@ class GoogleSheetsService:
                 return False
 
             # Add user to worksheet
-            from datetime import datetime
             current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             users_worksheet.append_row([email.lower(), password_hash, name, current_time])
 
@@ -1076,7 +1076,6 @@ class GoogleSheetsService:
                     return False
 
             # Add comment to worksheet
-            from datetime import datetime
             current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             comments_worksheet.append_row([
                 comment_type, reference_id, author_email, author_name, 
@@ -1158,7 +1157,8 @@ class GoogleSheetsService:
         Returns:
             List[Dict]: List of comments for the material
         """
-        reference_id = f"{course_slug}:{material_title}"
+        # Use :: as separator to avoid conflicts with material titles containing colons
+        reference_id = f"{course_slug}::{material_title}"
         return self.get_comments(comment_type='material', reference_id=reference_id)
 
     def get_profile_comments(self, user_email: str) -> List[Dict]:

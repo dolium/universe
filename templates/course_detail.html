@@ -145,7 +145,7 @@
                     {% if current_user.is_authenticated %}
                       <form method="post" action="{{ url_for('add_comment') }}" style="margin-bottom:15px">
                         <input type="hidden" name="comment_type" value="material" />
-                        <input type="hidden" name="reference_id" value="{{ course.slug }}:{{ m.title }}" />
+                        <input type="hidden" name="reference_id" value="{{ course.slug }}::{{ m.title }}" />
                         <div style="margin-bottom:10px">
                           <textarea 
                             name="comment_text" 
