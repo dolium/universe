@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}User Profiles - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="profiles-page">
+  <div class="container">
+    <h1 style="margin-bottom:30px">User Profiles</h1>
+    
+    <!-- Search Bar -->
+    <div class="panel" style="margin-bottom:30px">
+      <form method="get" action="{{ url_for('profiles') }}" style="display:flex;gap:10px;align-items:center">
+        <input 
+          type="text" 
+          name="search" 
+          placeholder="Search by name or email..." 
+          value="{{ search_query }}"
+          style="flex:1;padding:10px;border:1px solid #444;border-radius:5px;background:#2a2a2a;color:#fff"
+        />
+        <button type="submit" class="btn">Search</button>
+        {% if search_query %}
+          <a href="{{ url_for('profiles') }}" class="btn">Clear</a>
+        {% endif %}
+      </form>
+      <p style="margin-top:15px;color:#888;font-size:14px">
+        {% if search_query %}
+          Showing {{ users|length }} of {{ total_count }} users
+        {% else %}
+          Total users: {{ total_count }}
+        {% endif %}
+      </p>
+    </div>
+    
+    <!-- Users List -->
+    <div class="panel">
+      <h3 style="margin-bottom:20px">All Users</h3>
+      {% if users and users|length > 0 %}
+        <div class="users-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px">
+          {% for user in users %}
+            <div class="user-card" style="padding:20px;background:#2a2a2a;border-radius:8px;border:1px solid #444">
+              <div style="display:flex;align-items:center;gap:15px;margin-bottom:10px">
+                <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:bold">
+                  {{ user.name[0]|upper if user.name else '?' }}
+                </div>
+                <div style="flex:1">
+                  <h4 style="margin:0 0 5px 0;font-size:18px">
+                    <a href="{{ url_for('account', email=user.email) }}" style="color:#fff;text-decoration:none">
+                      {{ user.name }}
+                    </a>
+                  </h4>
+                  <p style="margin:0;color:#888;font-size:13px">{{ user.email }}</p>
+                </div>
+              </div>
+              {% if user.created %}
+                <p style="margin:10px 0 0 0;color:#888;font-size:12px">
+                  Joined: {{ user.created }}
+                </p>
+              {% endif %}
+              <div style="margin-top:15px">
+                <a href="{{ url_for('account', email=user.email) }}" class="btn small" style="width:100%;text-align:center">
+                  View Profile
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="muted">
+          {% if search_query %}
+            No users found matching "{{ search_query }}".
+          {% else %}
+            No users registered yet.
+          {% endif %}
+        </p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

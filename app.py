@@ -200,6 +200,10 @@ def create_app(config_name: str = None) -> Flask:
 
         # Load materials associated with this course
         course_materials = sheets_service.get_course_materials(slug)
+        
+        # Load comments for each material
+        for material in course_materials:
+            material['comments'] = sheets_service.get_material_comments(slug, material['title'])
 
         template_context = get_common_template_context()
         template_context.update({
@@ -494,10 +498,14 @@ def create_app(config_name: str = None) -> Flask:
             else:
                 material['course_name'] = 'Unknown Course'
         
+        # Get comments on this profile
+        profile_comments = sheets_service.get_profile_comments(email)
+        
         template_context = get_common_template_context()
         template_context.update({
             'user': user_data,
             'materials': user_materials,
+            'comments': profile_comments,
             'is_own_account': current_user.is_authenticated and current_user.email.lower() == email.lower()
         })
         
@@ -565,6 +573,64 @@ def create_app(config_name: str = None) -> Flask:
             flash('Failed to update verification status. Please try again.', 'error')
         
         return redirect(request.referrer or url_for('course_detail', slug=course_slug))
+
+    @application.route('/add_comment', methods=['POST'])
+    @login_required
+    def add_comment():
+        """Handle comment submission on materials or profiles."""
+        comment_type = request.form.get('comment_type', '').strip()
+        reference_id = request.form.get('reference_id', '').strip()
+        comment_text = request.form.get('comment_text', '').strip()
+        
+        if not all([comment_type, reference_id, comment_text]):
+            flash('Please provide a valid comment.', 'error')
+            return redirect(request.referrer or url_for('index'))
+        
+        if comment_type not in ['material', 'profile']:
+            flash('Invalid comment type.', 'error')
+            return redirect(request.referrer or url_for('index'))
+        
+        # Create the comment
+        success = sheets_service.create_comment(
+            comment_type=comment_type,
+            reference_id=reference_id,
+            author_email=current_user.email,
+            author_name=current_user.name,
+            comment_text=comment_text
+        )
+        
+        if success:
+            flash('Comment added successfully!', 'success')
+        else:
+            flash('Failed to add comment. Please try again.', 'error')
+        
+        return redirect(request.referrer or url_for('index'))
+
+    @application.route('/profiles')
+    def profiles():
+        """Render the profiles page showing all registered users."""
+        all_users = sheets_service.get_all_users()
+        
+        # Get search query from request
+        search_query = request.args.get('search', '').strip().lower()
+        
+        # Filter users by search query if provided
+        if search_query:
+            filtered_users = [
+                user for user in all_users
+                if search_query in (user.get('name') or '').lower() or search_query in (user.get('email') or '').lower()
+            ]
+        else:
+            filtered_users = all_users
+        
+        template_context = get_common_template_context()
+        template_context.update({
+            'users': filtered_users,
+            'search_query': search_query,
+            'total_count': len(all_users)
+        })
+        
+        return render_template('profiles.html', **template_context)
 
     return application
 

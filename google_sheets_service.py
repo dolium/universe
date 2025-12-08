@@ -1,5 +1,6 @@
 import os
 import re
+from datetime import datetime
 from typing import List, Dict, Optional
 import gspread
 from google.oauth2.service_account import Credentials
@@ -34,6 +35,7 @@ class GoogleSheetsService:
         self.opportunities_worksheet_name = config.OPPORTUNITIES_WORKSHEET_NAME
         self.professor_availability_worksheet_name = config.PROFESSOR_AVAILABILITY_WORKSHEET_NAME
         self.users_worksheet_name = config.USERS_WORKSHEET_NAME
+        self.comments_worksheet_name = config.COMMENTS_WORKSHEET_NAME
         self.google_client = None
         self.current_data_source = self.DATA_SOURCE_UNKNOWN
 
@@ -758,7 +760,6 @@ class GoogleSheetsService:
                 return False
 
             # Add user to worksheet
-            from datetime import datetime
             current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             users_worksheet.append_row([email.lower(), password_hash, name, current_time])
 
@@ -1024,6 +1025,199 @@ class GoogleSheetsService:
         except Exception as error:
             print(f"[ERROR] Failed to verify material: {error}")
             return False
+
+    def create_comment(self, comment_type: str, reference_id: str, author_email: str, 
+                      author_name: str, comment_text: str) -> bool:
+        """
+        Create a new comment on a material or user profile.
+        
+        Args:
+            comment_type: Type of comment ('material' or 'profile')
+            reference_id: For materials: 'course_slug:material_title', for profiles: user email
+            author_email: Email of the comment author
+            author_name: Name of the comment author
+            comment_text: The comment content
+            
+        Returns:
+            bool: True if comment created successfully, False otherwise
+        """
+        try:
+            # Ensure we have an authenticated client with write permissions
+            if not self.google_client:
+                if not self.authenticate_with_google():
+                    return False
+            
+            # Ensure write permissions (re-auth if needed)
+            if not self._ensure_write_permissions():
+                return False
+
+            if not self.spreadsheet_id:
+                return False
+
+            spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
+
+            try:
+                comments_worksheet = spreadsheet.worksheet(self.comments_worksheet_name)
+            except Exception:
+                # Create the worksheet if it doesn't exist
+                try:
+                    comments_worksheet = spreadsheet.add_worksheet(
+                        title=self.comments_worksheet_name,
+                        rows=1000,
+                        cols=10
+                    )
+                    # Add header row
+                    comments_worksheet.append_row([
+                        'Type', 'Reference ID', 'Author Email', 'Author Name', 
+                        'Comment', 'Created'
+                    ])
+                except Exception as create_error:
+                    print(f"[ERROR] Failed to create Comments worksheet: {create_error}")
+                    return False
+
+            # Add comment to worksheet
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            comments_worksheet.append_row([
+                comment_type, reference_id, author_email, author_name, 
+                comment_text, current_time
+            ])
+
+            return True
+
+        except Exception as error:
+            print(f"[ERROR] Failed to create comment: {error}")
+            return False
+
+    def get_comments(self, comment_type: str = None, reference_id: str = None) -> List[Dict]:
+        """
+        Get comments, optionally filtered by type and/or reference ID.
+        
+        Args:
+            comment_type: Optional filter by comment type ('material' or 'profile')
+            reference_id: Optional filter by reference ID
+            
+        Returns:
+            List[Dict]: List of comment dictionaries
+        """
+        try:
+            # Ensure client is authenticated
+            if not self.google_client:
+                if not self.authenticate_with_google():
+                    return []
+
+            if not self.spreadsheet_id:
+                return []
+
+            spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
+
+            try:
+                comments_worksheet = spreadsheet.worksheet(self.comments_worksheet_name)
+            except Exception:
+                # Comments worksheet doesn't exist yet
+                return []
+
+            raw_records = comments_worksheet.get_all_records()
+            comments = []
+
+            for record in raw_records:
+                type_val = record.get('Type', '').strip()
+                ref_id = record.get('Reference ID', '').strip()
+                
+                # Apply filters if provided
+                if comment_type and type_val != comment_type:
+                    continue
+                if reference_id and ref_id != reference_id:
+                    continue
+                
+                comments.append({
+                    'type': type_val,
+                    'reference_id': ref_id,
+                    'author_email': record.get('Author Email', '').strip(),
+                    'author_name': record.get('Author Name', '').strip(),
+                    'comment': record.get('Comment', '').strip(),
+                    'created': record.get('Created', '').strip(),
+                })
+
+            # Sort by created date (newest first)
+            comments.sort(key=lambda x: x['created'], reverse=True)
+            return comments
+
+        except Exception as error:
+            print(f"[ERROR] Failed to get comments: {error}")
+            return []
+
+    def get_material_comments(self, course_slug: str, material_title: str) -> List[Dict]:
+        """
+        Get all comments for a specific material.
+        
+        Args:
+            course_slug: URL slug of the course
+            material_title: Title of the material
+            
+        Returns:
+            List[Dict]: List of comments for the material
+        """
+        # Use :: as separator to avoid conflicts with material titles containing colons
+        reference_id = f"{course_slug}::{material_title}"
+        return self.get_comments(comment_type='material', reference_id=reference_id)
+
+    def get_profile_comments(self, user_email: str) -> List[Dict]:
+        """
+        Get all comments for a specific user profile.
+        
+        Args:
+            user_email: Email of the user
+            
+        Returns:
+            List[Dict]: List of comments for the profile
+        """
+        return self.get_comments(comment_type='profile', reference_id=user_email.lower())
+
+    def get_all_users(self) -> List[Dict]:
+        """
+        Get all registered users from the Users worksheet.
+        
+        Returns:
+            List[Dict]: List of user dictionaries with email and name
+        """
+        try:
+            # Ensure client is authenticated
+            if not self.google_client:
+                if not self.authenticate_with_google():
+                    return []
+
+            if not self.spreadsheet_id:
+                return []
+
+            spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
+
+            try:
+                users_worksheet = spreadsheet.worksheet(self.users_worksheet_name)
+            except Exception:
+                # Users worksheet doesn't exist yet
+                return []
+
+            raw_records = users_worksheet.get_all_records()
+            users = []
+
+            for record in raw_records:
+                email = record.get('Email', '').strip()
+                name = record.get('Name', '').strip()
+                
+                if email:  # Only include records with an email
+                    users.append({
+                        'email': email,
+                        'name': name,
+                        'created': record.get('Created', '').strip(),
+                    })
+
+            # Sort by name
+            users.sort(key=lambda x: x['name'].lower())
+            return users
+
+        except Exception as error:
+            print(f"[ERROR] Failed to get all users: {error}")
+            return []
 
 
 # Create a singleton instance
