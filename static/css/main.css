@@ -811,4 +811,15 @@ body {
 @media (max-width: 800px) {
   .course-sections { grid-template-columns: 1fr; }
   .course-detail .course-header { grid-template-columns: 72px 1fr; }
+  
+  /* Responsive language switcher */
+  .language-switcher {
+    margin-right: 8px;
+    padding: 4px 8px;
+  }
+  
+  .lang-link {
+    font-size: 12px;
+    padding: 3px 6px;
+  }
 }

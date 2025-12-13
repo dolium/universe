@@ -9,7 +9,7 @@ Provides courses, materials, and opportunities management.
 from typing import Dict, List
 from flask import Flask, render_template, abort, request, redirect, url_for, flash, session
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from flask_babel import Babel, gettext
+from flask_babel import Babel
 import bcrypt
 from config import get_config
 from google_sheets_service import sheets_service
