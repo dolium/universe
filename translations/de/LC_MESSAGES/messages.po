@@ -1,0 +1,158 @@
+# German translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-12-13 12:41+0000\n"
+"PO-Revision-Date: 2025-12-13 12:41+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/base.html:20
+msgid "Mission"
+msgstr "Mission"
+
+#: templates/base.html:21 templates/index.html:14 templates/index.html:27
+msgid "Courses"
+msgstr "Kurse"
+
+#: templates/base.html:22 templates/index.html:15 templates/index.html:36
+msgid "Opportunities"
+msgstr "Möglichkeiten"
+
+#: templates/base.html:23
+msgid "Professor Availability"
+msgstr "Professorenverfügbarkeit"
+
+#: templates/base.html:24
+msgid "Profiles"
+msgstr "Profile"
+
+#: templates/base.html:25 templates/index.html:16 templates/index.html:45
+msgid "How‑to"
+msgstr "Anleitungen"
+
+#: templates/base.html:26
+msgid "Contribute"
+msgstr "Beitragen"
+
+#: templates/base.html:38
+#, python-format
+msgid "Hi, %(name)s!"
+msgstr "Hallo, %(name)s!"
+
+#: templates/base.html:39
+msgid "My Account"
+msgstr "Mein Konto"
+
+#: templates/base.html:40
+msgid "Logout"
+msgstr "Abmelden"
+
+#: templates/base.html:42
+msgid "Login"
+msgstr "Anmelden"
+
+#: templates/base.html:43
+msgid "Register"
+msgstr "Registrieren"
+
+#: templates/base.html:69
+msgid "Built by students, for students."
+msgstr "Von Studierenden für Studierende."
+
+#: templates/index.html:3
+msgid "Public Landing"
+msgstr "Öffentliche Startseite"
+
+#: templates/index.html:10
+msgid ""
+"A social‑academic platform that helps students share notes, connect, and "
+"find their way – from courses and thesis help to housing tips and campus "
+"life."
+msgstr ""
+"Eine sozial-akademische Plattform, die Studierenden hilft, Notizen zu teilen, "
+"sich zu vernetzen und ihren Weg zu finden – von Kursen und Abschlussarbeitshilfe "
+"bis zu Wohnungstipps und Campusleben."
+
+#: templates/index.html:14
+msgid "Find and organize course pages"
+msgstr "Kursseiten finden und organisieren"
+
+#: templates/index.html:15
+msgid "Housing, jobs, events, mentoring"
+msgstr "Wohnungen, Jobs, Veranstaltungen, Mentoring"
+
+#: templates/index.html:16
+msgid "Visa, bureaucracy, campus tips"
+msgstr "Visum, Bürokratie, Campus-Tipps"
+
+#: templates/index.html:20
+msgid "Want to help?"
+msgstr "Möchten Sie helfen?"
+
+#: templates/index.html:20
+msgid "Contribute here"
+msgstr "Hier beitragen"
+
+#: templates/index.html:29
+msgid ""
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer "
+"tincidunt nunc eu pulvinar suscipit. Focus: structured course hubs with "
+"links to lectures, study groups, and smart matching for peers."
+msgstr ""
+"Strukturierte Kurs-Hubs mit Links zu Vorlesungen, Lerngruppen und intelligentem "
+"Matching für Kommilitonen. Finden Sie alle Kursinformationen an einem Ort."
+
+#: templates/index.html:38
+msgid ""
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula "
+"urna at dignissim efficitur. Find housing leads, part‑time jobs, "
+"mentoring offers, and local events all in one place."
+msgstr ""
+"Finden Sie Wohnungsangebote, Teilzeitjobs, Mentoring-Angebote und lokale "
+"Veranstaltungen – alles an einem Ort."
+
+#: templates/index.html:47
+msgid ""
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus "
+"lacinia eros vitae mollis laoreet. Quick guides for visas, enrollment, "
+"bureaucracy, and everyday campus hacks."
+msgstr ""
+"Schnelle Anleitungen für Visa, Einschreibung, Bürokratie und alltägliche "
+"Campus-Tricks."
+
+#: templates/index.html:54
+msgid "How to contribute"
+msgstr "Wie man beiträgt"
+
+#: templates/index.html:56
+msgid "Fork the repository and create a feature branch."
+msgstr "Forken Sie das Repository und erstellen Sie einen Feature-Branch."
+
+#: templates/index.html:57
+msgid "Add or edit a page in templates/ or styles in static/css/."
+msgstr "Fügen Sie eine Seite in templates/ hinzu oder bearbeiten Sie Styles in static/css/."
+
+#: templates/index.html:58
+msgid "Write a short description and open a pull request."
+msgstr "Schreiben Sie eine kurze Beschreibung und öffnen Sie einen Pull Request."
+
+#: templates/index.html:61
+msgid ""
+"Ideas welcome: AI assistant, reputation & mentorship, OTH integrations, "
+"dashboards."
+msgstr ""
+"Ideen willkommen: KI-Assistent, Reputation & Mentoring, OTH-Integrationen, "
+"Dashboards."
+

@@ -7,8 +7,9 @@ Flask application for UniVerse - A social-academic hub for students.
 Provides courses, materials, and opportunities management.
 """
 from typing import Dict, List
-from flask import Flask, render_template, abort, request, redirect, url_for, flash
+from flask import Flask, render_template, abort, request, redirect, url_for, flash, session
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_babel import Babel, gettext
 import bcrypt
 from config import get_config
 from google_sheets_service import sheets_service
@@ -45,6 +46,20 @@ def create_app(config_name: str = None) -> Flask:
     # Load configuration
     config = get_config(config_name)
     application.config.from_object(config)
+
+    # Configure Babel for internationalization
+    application.config['BABEL_DEFAULT_LOCALE'] = 'en'
+    application.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
+    babel = Babel(application)
+
+    def get_locale():
+        # Check if language is set in session
+        if 'language' in session:
+            return session['language']
+        # Otherwise, try to guess the language from the request
+        return request.accept_languages.best_match(['en', 'de']) or 'en'
+    
+    babel.init_app(application, locale_selector=get_locale)
 
     # Initialize Flask-Login
     login_manager = LoginManager()
@@ -631,6 +646,13 @@ def create_app(config_name: str = None) -> Flask:
         })
         
         return render_template('profiles.html', **template_context)
+
+    @application.route('/set_language/<language>')
+    def set_language(language):
+        """Set the user's preferred language."""
+        if language in ['en', 'de']:
+            session['language'] = language
+        return redirect(request.referrer or url_for('index'))
 
     return application
 
