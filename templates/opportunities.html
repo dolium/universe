@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Opportunities - {{ site_name }}{% endblock %}
+{% block title %}{{ _('Opportunities') }} - {{ site_name }}{% endblock %}
 
 {% block content %}
 <section class="courses-hero">
   <div class="container">
-    <h1>Opportunities</h1>
-    <p>Jobs, events, study groups, and more submitted by the community</p>
+    <h1>{{ _('Opportunities') }}</h1>
+    <p>{{ _('Jobs, events, study groups, and more submitted by the community') }}</p>
     <div style="margin-top:16px; display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start; justify-content:center;">
       {% if opportunities_form_url %}
-        <a class="btn btn-primary" target="_blank" rel="noopener" href="{{ opportunities_form_url }}">Add new opportunity</a>
+        <a class="btn btn-primary" target="_blank" rel="noopener" href="{{ opportunities_form_url }}">{{ _('Add new opportunity') }}</a>
       {% endif %}
 
       <form method="get" action="{{ url_for('opportunities') }}" style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start; justify-content:center; max-width:900px;">
         <select name="type" onchange="this.form.submit()" class="btn small" style="background:var(--panel);border-color:#2a2b33;">
-          <option value="">All types</option>
+          <option value="">{{ _('All types') }}</option>
           {% for t in filters_types %}
             <option value="{{ t }}" {% if selected_type and selected_type|lower == t|lower %}selected{% endif %}>{{ t }}</option>
           {% endfor %}
@@ -23,9 +23,9 @@
         {% if filters_programmes %}
         <div class="course-filters" style="margin:0; min-width:260px;">
           <div class="course-filters-header">
-            <span class="course-filters-label">Study programmes:</span>
+            <span class="course-filters-label">{{ _('Study programmes:') }}</span>
             {% if selected_programmes and selected_programmes|length < filters_programmes|length %}
-            <span class="course-filters-active">{{ selected_programmes|length }} selected</span>
+            <span class="course-filters-active">{{ _('%(count)d selected', count=selected_programmes|length) }}</span>
             {% endif %}
           </div>
           <div class="course-filters-grid">
@@ -45,14 +45,14 @@
           <div class="course-filters-actions">
             <button type="submit" class="btn small btn-ok-dark">OK</button>
             {% if selected_type or selected_programmes %}
-            <a href="{{ url_for('opportunities') }}" class="btn small">Reset</a>
+            <a href="{{ url_for('opportunities') }}" class="btn small">{{ _('Reset') }}</a>
             {% endif %}
           </div>
         </div>
         {% endif %}
       </form>
     </div>
-    <p class="muted" style="margin-top:8px">Showing {{ opportunities|length }} of {{ total_count }} opportunities</p>
+    <p class="muted" style="margin-top:8px">{{ _('Showing %(count)d of %(total)d opportunities', count=opportunities|length, total=total_count) }}</p>
   </div>
 </section>
 

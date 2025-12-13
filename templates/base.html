@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ get_locale() }}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -17,23 +17,30 @@
       <label class="menu-btn" for="menu-toggle" aria-label="Toggle menu"><span></span></label>
 
       <nav class="nav">
-        <a href="#mission">Mission</a>
-        <a href="{{ url_for('courses') }}">Courses</a>
-        <a href="{{ url_for('opportunities') }}">Opportunities</a>
-        <a href="{{ url_for('timetable') }}">Professor Availability</a>
-        <a href="{{ url_for('profiles') }}">Profiles</a>
-        <a href="#howto">How‑to</a>
-        <a href="#contribute">Contribute</a>
+        <a href="#mission">{{ _('Mission') }}</a>
+        <a href="{{ url_for('courses') }}">{{ _('Courses') }}</a>
+        <a href="{{ url_for('opportunities') }}">{{ _('Opportunities') }}</a>
+        <a href="{{ url_for('timetable') }}">{{ _('Professor Availability') }}</a>
+        <a href="{{ url_for('profiles') }}">{{ _('Profiles') }}</a>
+        <a href="#howto">{{ _('How‑to') }}</a>
+        <a href="#contribute">{{ _('Contribute') }}</a>
       </nav>
 
       <div class="toolbar-tools">
+        <!-- Language switcher -->
+        <div class="language-switcher">
+          <a href="{{ url_for('set_language', language='en') }}" class="lang-link {% if get_locale() == 'en' %}active{% endif %}" title="English">EN</a>
+          <span class="lang-separator">|</span>
+          <a href="{{ url_for('set_language', language='de') }}" class="lang-link {% if get_locale() == 'de' %}active{% endif %}" title="Deutsch">DE</a>
+        </div>
+        
         {% if current_user.is_authenticated %}
-          <span class="user-greeting">Hi, {{ current_user.name }}!</span>
-          <a class="btn small" href="{{ url_for('account') }}">My Account</a>
-          <a class="btn small" href="{{ url_for('logout') }}">Logout</a>
+          <span class="user-greeting">{{ _('Hi, %(name)s!', name=current_user.name) }}</span>
+          <a class="btn small" href="{{ url_for('account') }}">{{ _('My Account') }}</a>
+          <a class="btn small" href="{{ url_for('logout') }}">{{ _('Logout') }}</a>
         {% else %}
-          <a class="btn small" href="{{ url_for('login') }}">Login</a>
-          <a class="btn small btn-primary" href="{{ url_for('register') }}">Register</a>
+          <a class="btn small" href="{{ url_for('login') }}">{{ _('Login') }}</a>
+          <a class="btn small btn-primary" href="{{ url_for('register') }}">{{ _('Register') }}</a>
         {% endif %}
       </div>
     </div>
@@ -59,7 +66,7 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>© <span id="year"></span> {{ site_name }}. Built by students, for students.</p>
+      <p>© <span id="year"></span> {{ site_name }}. {{ _('Built by students, for students.') }}</p>
     </div>
   </footer>
 

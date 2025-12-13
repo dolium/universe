@@ -1,68 +1,64 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ site_name }} – Public Landing{% endblock %}
+{% block title %}{{ site_name }} – {{ _('Public Landing') }}{% endblock %}
 
 {% block content %}
 <section id="mission" class="hero">
   <div class="container">
     <h1>{{ site_name }}</h1>
     <p class="lead">
-      A social‑academic platform that helps students share notes, connect, and find their way –
-      from courses and thesis help to housing tips and campus life.
+      {{ _('A social‑academic platform that helps students share notes, connect, and find their way – from courses and thesis help to housing tips and campus life.') }}
     </p>
 
     <div class="big-buttons">
-      <a class="big-button" href="{{ url_for('courses') }}"><span class="bb-title">Courses</span><span class="bb-sub">Find and organize course pages</span></a>
-      <a class="big-button" href="#opportunities"><span class="bb-title">Opportunities</span><span class="bb-sub">Housing, jobs, events, mentoring</span></a>
-      <a class="big-button" href="#howto"><span class="bb-title">How‑to</span><span class="bb-sub">Visa, bureaucracy, campus tips</span></a>
+      <a class="big-button" href="{{ url_for('courses') }}"><span class="bb-title">{{ _('Courses') }}</span><span class="bb-sub">{{ _('Find and organize course pages') }}</span></a>
+      <a class="big-button" href="#opportunities"><span class="bb-title">{{ _('Opportunities') }}</span><span class="bb-sub">{{ _('Housing, jobs, events, mentoring') }}</span></a>
+      <a class="big-button" href="#howto"><span class="bb-title">{{ _('How‑to') }}</span><span class="bb-sub">{{ _('Visa, bureaucracy, campus tips') }}</span></a>
     </div>
 
     <p class="contrib-inline">
-      Want to help? <a href="#contribute">Contribute here</a>.
+      {{ _('Want to help?') }} <a href="#contribute">{{ _('Contribute here') }}</a>.
     </p>
   </div>
 </section>
 
 <section id="courses" class="section">
   <div class="container">
-    <h2>Courses</h2>
+    <h2>{{ _('Courses') }}</h2>
     <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tincidunt nunc eu pulvinar suscipit.
-      Focus: structured course hubs with links to lectures, study groups, and smart matching for peers.
+      {{ _('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tincidunt nunc eu pulvinar suscipit. Focus: structured course hubs with links to lectures, study groups, and smart matching for peers.') }}
     </p>
   </div>
 </section>
 
 <section id="opportunities" class="section">
   <div class="container">
-    <h2>Opportunities</h2>
+    <h2>{{ _('Opportunities') }}</h2>
     <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula urna at dignissim efficitur.
-      Find housing leads, part‑time jobs, mentoring offers, and local events all in one place.
+      {{ _('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula urna at dignissim efficitur. Find housing leads, part‑time jobs, mentoring offers, and local events all in one place.') }}
     </p>
   </div>
 </section>
 
 <section id="howto" class="section">
   <div class="container">
-    <h2>How‑to</h2>
+    <h2>{{ _('How‑to') }}</h2>
     <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus lacinia eros vitae mollis laoreet.
-      Quick guides for visas, enrollment, bureaucracy, and everyday campus hacks.
+      {{ _('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus lacinia eros vitae mollis laoreet. Quick guides for visas, enrollment, bureaucracy, and everyday campus hacks.') }}
     </p>
   </div>
 </section>
 
 <section id="contribute" class="section">
   <div class="container">
-    <h2>How to contribute</h2>
+    <h2>{{ _('How to contribute') }}</h2>
     <ol>
-      <li>Fork the repository and create a feature branch.</li>
-      <li>Add or edit a page in <code>templates/</code> or styles in <code>static/css/</code>.</li>
-      <li>Write a short description and open a pull request.</li>
+      <li>{{ _('Fork the repository and create a feature branch.') }}</li>
+      <li>{{ _('Add or edit a page in templates/ or styles in static/css/.') }}</li>
+      <li>{{ _('Write a short description and open a pull request.') }}</li>
     </ol>
     <p>
-      Ideas welcome: AI assistant, reputation & mentorship, OTH integrations, dashboards.
+      {{ _('Ideas welcome: AI assistant, reputation & mentorship, OTH integrations, dashboards.') }}
     </p>
   </div>
 </section>
