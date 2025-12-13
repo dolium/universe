@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-13 12:41+0000\n"
+"POT-Creation-Date: 2025-12-13 12:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,11 +21,13 @@ msgstr ""
 msgid "Mission"
 msgstr ""
 
-#: templates/base.html:21 templates/index.html:14 templates/index.html:27
+#: templates/base.html:21 templates/courses.html:3 templates/index.html:14
+#: templates/index.html:27
 msgid "Courses"
 msgstr ""
 
 #: templates/base.html:22 templates/index.html:15 templates/index.html:36
+#: templates/opportunities.html:3 templates/opportunities.html:8
 msgid "Opportunities"
 msgstr ""
 
@@ -68,6 +70,34 @@ msgstr ""
 
 #: templates/base.html:69
 msgid "Built by students, for students."
+msgstr ""
+
+#: templates/courses.html:8
+msgid "STEM Courses"
+msgstr ""
+
+#: templates/courses.html:9
+msgid ""
+"Explore our STEM catalog — mathematics, physics, chemistry, biology, CS, "
+"and engineering"
+msgstr ""
+
+#: templates/courses.html:17
+msgid "Filter by study programme:"
+msgstr ""
+
+#: templates/courses.html:19 templates/opportunities.html:28
+#, python-format
+msgid "%(count)d selected"
+msgstr ""
+
+#: templates/courses.html:39 templates/opportunities.html:48
+msgid "Reset"
+msgstr ""
+
+#: templates/courses.html:41
+#, python-format
+msgid "Showing %(count)d of %(total)d courses"
 msgstr ""
 
 #: templates/index.html:3
@@ -142,5 +172,26 @@ msgstr ""
 msgid ""
 "Ideas welcome: AI assistant, reputation & mentorship, OTH integrations, "
 "dashboards."
+msgstr ""
+
+#: templates/opportunities.html:9
+msgid "Jobs, events, study groups, and more submitted by the community"
+msgstr ""
+
+#: templates/opportunities.html:12
+msgid "Add new opportunity"
+msgstr ""
+
+#: templates/opportunities.html:17
+msgid "All types"
+msgstr ""
+
+#: templates/opportunities.html:26
+msgid "Study programmes:"
+msgstr ""
+
+#: templates/opportunities.html:55
+#, python-format
+msgid "Showing %(count)d of %(total)d opportunities"
 msgstr ""
 

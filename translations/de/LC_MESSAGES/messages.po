@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-13 12:41+0000\n"
+"POT-Creation-Date: 2025-12-13 12:43+0000\n"
 "PO-Revision-Date: 2025-12-13 12:41+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -22,11 +22,13 @@ msgstr ""
 msgid "Mission"
 msgstr "Mission"
 
-#: templates/base.html:21 templates/index.html:14 templates/index.html:27
+#: templates/base.html:21 templates/courses.html:3 templates/index.html:14
+#: templates/index.html:27
 msgid "Courses"
 msgstr "Kurse"
 
 #: templates/base.html:22 templates/index.html:15 templates/index.html:36
+#: templates/opportunities.html:3 templates/opportunities.html:8
 msgid "Opportunities"
 msgstr "Möglichkeiten"
 
@@ -71,6 +73,36 @@ msgstr "Registrieren"
 msgid "Built by students, for students."
 msgstr "Von Studierenden für Studierende."
 
+#: templates/courses.html:8
+msgid "STEM Courses"
+msgstr "STEM-Kurse"
+
+#: templates/courses.html:9
+msgid ""
+"Explore our STEM catalog — mathematics, physics, chemistry, biology, CS, "
+"and engineering"
+msgstr ""
+"Erkunden Sie unseren STEM-Katalog — Mathematik, Physik, Chemie, Biologie, "
+"Informatik und Ingenieurwesen"
+
+#: templates/courses.html:17
+msgid "Filter by study programme:"
+msgstr "Nach Studiengang filtern:"
+
+#: templates/courses.html:19 templates/opportunities.html:28
+#, python-format
+msgid "%(count)d selected"
+msgstr "%(count)d ausgewählt"
+
+#: templates/courses.html:39 templates/opportunities.html:48
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+#: templates/courses.html:41
+#, python-format
+msgid "Showing %(count)d of %(total)d courses"
+msgstr "Zeige %(count)d von %(total)d Kursen"
+
 #: templates/index.html:3
 msgid "Public Landing"
 msgstr "Öffentliche Startseite"
@@ -81,9 +113,9 @@ msgid ""
 "find their way – from courses and thesis help to housing tips and campus "
 "life."
 msgstr ""
-"Eine sozial-akademische Plattform, die Studierenden hilft, Notizen zu teilen, "
-"sich zu vernetzen und ihren Weg zu finden – von Kursen und Abschlussarbeitshilfe "
-"bis zu Wohnungstipps und Campusleben."
+"Eine sozial-akademische Plattform, die Studierenden hilft, Notizen zu "
+"teilen, sich zu vernetzen und ihren Weg zu finden – von Kursen und "
+"Abschlussarbeitshilfe bis zu Wohnungstipps und Campusleben."
 
 #: templates/index.html:14
 msgid "Find and organize course pages"
@@ -111,8 +143,9 @@ msgid ""
 "tincidunt nunc eu pulvinar suscipit. Focus: structured course hubs with "
 "links to lectures, study groups, and smart matching for peers."
 msgstr ""
-"Strukturierte Kurs-Hubs mit Links zu Vorlesungen, Lerngruppen und intelligentem "
-"Matching für Kommilitonen. Finden Sie alle Kursinformationen an einem Ort."
+"Strukturierte Kurs-Hubs mit Links zu Vorlesungen, Lerngruppen und "
+"intelligentem Matching für Kommilitonen. Finden Sie alle "
+"Kursinformationen an einem Ort."
 
 #: templates/index.html:38
 msgid ""
@@ -142,7 +175,9 @@ msgstr "Forken Sie das Repository und erstellen Sie einen Feature-Branch."
 
 #: templates/index.html:57
 msgid "Add or edit a page in templates/ or styles in static/css/."
-msgstr "Fügen Sie eine Seite in templates/ hinzu oder bearbeiten Sie Styles in static/css/."
+msgstr ""
+"Fügen Sie eine Seite in templates/ hinzu oder bearbeiten Sie Styles in "
+"static/css/."
 
 #: templates/index.html:58
 msgid "Write a short description and open a pull request."
@@ -153,6 +188,27 @@ msgid ""
 "Ideas welcome: AI assistant, reputation & mentorship, OTH integrations, "
 "dashboards."
 msgstr ""
-"Ideen willkommen: KI-Assistent, Reputation & Mentoring, OTH-Integrationen, "
-"Dashboards."
+"Ideen willkommen: KI-Assistent, Reputation & Mentoring, OTH-"
+"Integrationen, Dashboards."
+
+#: templates/opportunities.html:9
+msgid "Jobs, events, study groups, and more submitted by the community"
+msgstr "Jobs, Veranstaltungen, Lerngruppen und mehr von der Community eingereicht"
+
+#: templates/opportunities.html:12
+msgid "Add new opportunity"
+msgstr "Neue Möglichkeit hinzufügen"
+
+#: templates/opportunities.html:17
+msgid "All types"
+msgstr "Alle Typen"
+
+#: templates/opportunities.html:26
+msgid "Study programmes:"
+msgstr "Studiengänge:"
+
+#: templates/opportunities.html:55
+#, python-format
+msgid "Showing %(count)d of %(total)d opportunities"
+msgstr "Zeige %(count)d von %(total)d Möglichkeiten"
 

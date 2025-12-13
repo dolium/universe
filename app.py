@@ -61,6 +61,11 @@ def create_app(config_name: str = None) -> Flask:
     
     babel.init_app(application, locale_selector=get_locale)
 
+    # Make get_locale available in templates
+    @application.context_processor
+    def inject_locale():
+        return {'get_locale': get_locale}
+
     # Initialize Flask-Login
     login_manager = LoginManager()
     login_manager.init_app(application)

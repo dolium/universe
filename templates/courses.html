@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Courses - {{ site_name }}{% endblock %}
+{% block title %}{{ _('Courses') }} - {{ site_name }}{% endblock %}
 
 {% block content %}
 <div class="courses-hero">
     <div class="container">
-        <h1>STEM Courses</h1>
-        <p>Explore our STEM catalog — mathematics, physics, chemistry, biology, CS, and engineering</p>
+        <h1>{{ _('STEM Courses') }}</h1>
+        <p>{{ _('Explore our STEM catalog — mathematics, physics, chemistry, biology, CS, and engineering') }}</p>
     </div>
 </div>
 
@@ -14,9 +14,9 @@
     {% if filters_programmes %}
     <form method="get" class="course-filters">
         <div class="course-filters-header">
-            <span class="course-filters-label">Filter by study programme:</span>
+            <span class="course-filters-label">{{ _('Filter by study programme:') }}</span>
             {% if selected_programmes and selected_programmes|length < filters_programmes|length %}
-            <span class="course-filters-active">{{ selected_programmes|length }} selected</span>
+            <span class="course-filters-active">{{ _('%(count)d selected', count=selected_programmes|length) }}</span>
             {% endif %}
         </div>
         <div class="course-filters-grid">
@@ -36,9 +36,9 @@
         <div class="course-filters-actions">
             <button type="submit" class="btn small btn-ok-dark">OK</button>
             {% if selected_programmes %}
-            <a href="{{ url_for('courses') }}" class="btn small">Reset</a>
+            <a href="{{ url_for('courses') }}" class="btn small">{{ _('Reset') }}</a>
             {% endif %}
-            <span class="course-filters-count muted">Showing {{ courses|length }} of {{ total_courses_count }} courses</span>
+            <span class="course-filters-count muted">{{ _('Showing %(count)d of %(total)d courses', count=courses|length, total=total_courses_count) }}</span>
         </div>
     </form>
     {% endif %}
