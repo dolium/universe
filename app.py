@@ -126,16 +126,16 @@ def create_app(config_name: str = None) -> Flask:
 
         return render_template('courses.html', **template_context)
 
-    @application.route('/opportunities')
-    def opportunities():
-        """Render the opportunities page with filtering capabilities.
+    @application.route('/jobs')
+    def jobs():
+        """Render the jobs page with filtering capabilities.
         Supports filtering by type and multiple programmes from query parameters.
         """
-        all_opportunities = sheets_service.get_opportunities()
+        all_jobs = sheets_service.get_jobs()
 
         # Extract unique filter options from current data
-        available_types = _extract_unique_values(all_opportunities, 'type')
-        available_programmes = _extract_unique_values(all_opportunities, 'programme')
+        available_types = _extract_unique_values(all_jobs, 'type')
+        available_programmes = _extract_unique_values(all_jobs, 'programme')
 
         # Get filter parameters from request
         selected_type = request.args.get('type', '').strip()
@@ -143,24 +143,60 @@ def create_app(config_name: str = None) -> Flask:
         selected_programmes_norm = {p.strip().lower() for p in selected_programmes if p.strip()}
 
         # Apply filters
-        filtered_opportunities = _filter_opportunities(
-            all_opportunities,
+        filtered_jobs = _filter_items(
+            all_jobs,
             selected_type,
             selected_programmes_norm
         )
 
         template_context = get_common_template_context()
         template_context.update({
-            'opportunities': filtered_opportunities,
-            'opportunities_form_url': config.ADD_OPPORTUNITY_SHEET_URL,
+            'items': filtered_jobs,
+            'form_url': config.ADD_JOB_SHEET_URL,
             'filters_types': available_types,
             'filters_programmes': available_programmes,
             'selected_type': selected_type,
             'selected_programmes': list(selected_programmes_norm),
-            'total_count': len(all_opportunities)
+            'total_count': len(all_jobs)
         })
 
-        return render_template('opportunities.html', **template_context)
+        return render_template('jobs.html', **template_context)
+
+    @application.route('/events')
+    def events():
+        """Render the events page with filtering capabilities.
+        Supports filtering by type and multiple programmes from query parameters.
+        """
+        all_events = sheets_service.get_events()
+
+        # Extract unique filter options from current data
+        available_types = _extract_unique_values(all_events, 'type')
+        available_programmes = _extract_unique_values(all_events, 'programme')
+
+        # Get filter parameters from request
+        selected_type = request.args.get('type', '').strip()
+        selected_programmes = request.args.getlist('programme')
+        selected_programmes_norm = {p.strip().lower() for p in selected_programmes if p.strip()}
+
+        # Apply filters
+        filtered_events = _filter_items(
+            all_events,
+            selected_type,
+            selected_programmes_norm
+        )
+
+        template_context = get_common_template_context()
+        template_context.update({
+            'items': filtered_events,
+            'form_url': config.ADD_EVENT_SHEET_URL,
+            'filters_types': available_types,
+            'filters_programmes': available_programmes,
+            'selected_type': selected_type,
+            'selected_programmes': list(selected_programmes_norm),
+            'total_count': len(all_events)
+        })
+
+        return render_template('events.html', **template_context)
 
     def _extract_unique_values(items: List[Dict], field_name: str) -> List[str]:
         """
@@ -180,24 +216,24 @@ def create_app(config_name: str = None) -> Flask:
         }
         return sorted(unique_values)
 
-    def _filter_opportunities(
-        opportunities: List[Dict],
+    def _filter_items(
+        items: List[Dict],
         filter_type: str,
         filter_programmes: set
     ) -> List[Dict]:
-        """Filter opportunities by type and/or a set of programmes (case-insensitive)."""
-        filtered = opportunities
+        """Filter items by type and/or a set of programmes (case-insensitive)."""
+        filtered = items
 
         if filter_type:
             filtered = [
-                opp for opp in filtered
-                if (opp.get('type') or '').strip().lower() == filter_type.lower()
+                item for item in filtered
+                if (item.get('type') or '').strip().lower() == filter_type.lower()
             ]
 
         if filter_programmes:
             filtered = [
-                opp for opp in filtered
-                if (opp.get('programme') or '').strip().lower() in filter_programmes
+                item for item in filtered
+                if (item.get('programme') or '').strip().lower() in filter_programmes
             ]
 
         return filtered

@@ -27,6 +27,8 @@ class Config:
     COURSES_WORKSHEET_NAME = 'Courses'
     MATERIALS_WORKSHEET_NAME = os.getenv('MATERIALS_SHEET_NAME', 'Materials')
     OPPORTUNITIES_WORKSHEET_NAME = os.getenv('OPPORTUNITIES_SHEET_NAME', 'Opportunities')
+    JOBS_WORKSHEET_NAME = os.getenv('JOBS_SHEET_NAME', 'Jobs')
+    EVENTS_WORKSHEET_NAME = os.getenv('EVENTS_SHEET_NAME', 'Events')
     PROFESSOR_AVAILABILITY_WORKSHEET_NAME = os.getenv('PROFESSOR_AVAILABILITY_SHEET_NAME', 'Timetable')
     USERS_WORKSHEET_NAME = os.getenv('USERS_SHEET_NAME', 'Users')
     COMMENTS_WORKSHEET_NAME = os.getenv('COMMENTS_SHEET_NAME', 'Comments')
@@ -34,6 +36,8 @@ class Config:
     # External URLs for Adding Data
     ADD_MATERIAL_SHEET_URL = "https://docs.google.com/spreadsheets/d/1-bH05NhyJ1WFOcrmX0BtVVuvd4wWX4jx8VB-AYrOdQY/edit?gid=935728683#gid=935728683"
     ADD_OPPORTUNITY_SHEET_URL = "https://docs.google.com/spreadsheets/d/1-bH05NhyJ1WFOcrmX0BtVVuvd4wWX4jx8VB-AYrOdQY/edit?gid=998865460#gid=998865460"
+    ADD_JOB_SHEET_URL = os.getenv('ADD_JOB_SHEET_URL', "https://docs.google.com/spreadsheets/d/1-bH05NhyJ1WFOcrmX0BtVVuvd4wWX4jx8VB-AYrOdQY/edit")
+    ADD_EVENT_SHEET_URL = os.getenv('ADD_EVENT_SHEET_URL', "https://docs.google.com/spreadsheets/d/1-bH05NhyJ1WFOcrmX0BtVVuvd4wWX4jx8VB-AYrOdQY/edit")
     
     # Verification Settings
     VERIFICATION_EMAIL = os.getenv('VERIFICATION_EMAIL', 'as.dolium@gmail.com')
