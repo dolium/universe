@@ -10,7 +10,7 @@ from config import Config
 class GoogleSheetsService:
     """
     Service class for interacting with Google Sheets API.
-    Handles fetching courses, materials, and opportunities data.
+    Handles fetching courses, materials, jobs, and events data.
     Falls back to dummy data if Google Sheets is not configured.
     """
 
@@ -33,6 +33,8 @@ class GoogleSheetsService:
         self.credentials_file_path = config.GOOGLE_CREDENTIALS_FILE
         self.materials_worksheet_name = config.MATERIALS_WORKSHEET_NAME
         self.opportunities_worksheet_name = config.OPPORTUNITIES_WORKSHEET_NAME
+        self.jobs_worksheet_name = config.JOBS_WORKSHEET_NAME
+        self.events_worksheet_name = config.EVENTS_WORKSHEET_NAME
         self.professor_availability_worksheet_name = config.PROFESSOR_AVAILABILITY_WORKSHEET_NAME
         self.users_worksheet_name = config.USERS_WORKSHEET_NAME
         self.comments_worksheet_name = config.COMMENTS_WORKSHEET_NAME
@@ -360,6 +362,108 @@ class GoogleSheetsService:
             print(f"[ERROR] Failed to fetch opportunities: {error}")
             return self._get_fallback_opportunities()
 
+    def get_jobs(self) -> List[Dict[str, str]]:
+        """
+        Fetch all jobs from 'Jobs' worksheet.
+
+        Returns:
+            List[Dict]: List of job dictionaries with keys: title, type, programme, description
+        """
+        try:
+            # Ensure client is authenticated
+            if not self.google_client:
+                if not self.authenticate_with_google():
+                    return self._get_fallback_jobs()
+
+            if not self.spreadsheet_id:
+                return self._get_fallback_jobs()
+
+            spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
+
+            # Try to get worksheet by name
+            try:
+                jobs_worksheet = spreadsheet.worksheet(self.jobs_worksheet_name)
+            except Exception:
+                return self._get_fallback_jobs()
+
+            raw_records = jobs_worksheet.get_all_records()
+            jobs = []
+
+            for record in raw_records:
+                # Extract data with flexible column name matching
+                title = self._extract_field_value(record, ['Title', 'Job', 'Name'])
+                job_type = self._extract_field_value(record, ['Type', 'Category'])
+                programme = self._extract_field_value(record, ['Study Programme', 'StudyProgram', 'Programme', 'Program'])
+                description = self._extract_field_value(record, ['Description', 'Details'])
+
+                # Skip records without a title
+                if not title:
+                    continue
+
+                jobs.append({
+                    'title': title,
+                    'type': job_type,
+                    'programme': programme,
+                    'description': description,
+                })
+
+            return jobs
+
+        except Exception as error:
+            print(f"[ERROR] Failed to fetch jobs: {error}")
+            return self._get_fallback_jobs()
+
+    def get_events(self) -> List[Dict[str, str]]:
+        """
+        Fetch all events from 'Events' worksheet.
+
+        Returns:
+            List[Dict]: List of event dictionaries with keys: title, type, programme, description
+        """
+        try:
+            # Ensure client is authenticated
+            if not self.google_client:
+                if not self.authenticate_with_google():
+                    return self._get_fallback_events()
+
+            if not self.spreadsheet_id:
+                return self._get_fallback_events()
+
+            spreadsheet = self.google_client.open_by_key(self.spreadsheet_id)
+
+            # Try to get worksheet by name
+            try:
+                events_worksheet = spreadsheet.worksheet(self.events_worksheet_name)
+            except Exception:
+                return self._get_fallback_events()
+
+            raw_records = events_worksheet.get_all_records()
+            events = []
+
+            for record in raw_records:
+                # Extract data with flexible column name matching
+                title = self._extract_field_value(record, ['Title', 'Event', 'Name'])
+                event_type = self._extract_field_value(record, ['Type', 'Category'])
+                programme = self._extract_field_value(record, ['Study Programme', 'StudyProgram', 'Programme', 'Program'])
+                description = self._extract_field_value(record, ['Description', 'Details'])
+
+                # Skip records without a title
+                if not title:
+                    continue
+
+                events.append({
+                    'title': title,
+                    'type': event_type,
+                    'programme': programme,
+                    'description': description,
+                })
+
+            return events
+
+        except Exception as error:
+            print(f"[ERROR] Failed to fetch events: {error}")
+            return self._get_fallback_events()
+
     def _extract_field_value(self, record: Dict, possible_keys: List[str]) -> str:
         """
         Extract a field value from a record, trying multiple possible column names.
@@ -462,6 +566,32 @@ class GoogleSheetsService:
             { 'title': 'Part‑time Lab Assistant', 'type': 'job', 'programme': 'Physics', 'description': 'Assist in undergraduate lab sessions 10h/week.' },
             { 'title': 'Hackathon Weekend', 'type': 'fun', 'programme': 'CS', 'description': '48‑hour hackathon with mentors and prizes.' },
             { 'title': 'Tutoring Group: Calculus', 'type': 'study', 'programme': 'Engineering', 'description': 'Weekly peer tutoring for Calculus I.' },
+        ]
+
+    def _get_fallback_jobs(self) -> List[Dict[str, str]]:
+        """
+        Return fallback jobs data when Google Sheets is unavailable.
+
+        Returns:
+            List[Dict]: List of sample job dictionaries
+        """
+        return [
+            { 'title': 'Part‑time Lab Assistant', 'type': 'Part-time', 'programme': 'Physics', 'description': 'Assist in undergraduate lab sessions 10h/week.' },
+            { 'title': 'Research Assistant', 'type': 'Full-time', 'programme': 'CS', 'description': 'Help with AI research projects.' },
+            { 'title': 'Teaching Assistant', 'type': 'Part-time', 'programme': 'Mathematics', 'description': 'Support calculus tutorial sessions.' },
+        ]
+
+    def _get_fallback_events(self) -> List[Dict[str, str]]:
+        """
+        Return fallback events data when Google Sheets is unavailable.
+
+        Returns:
+            List[Dict]: List of sample event dictionaries
+        """
+        return [
+            { 'title': 'Hackathon Weekend', 'type': 'Competition', 'programme': 'CS', 'description': '48‑hour hackathon with mentors and prizes.' },
+            { 'title': 'Physics Colloquium', 'type': 'Seminar', 'programme': 'Physics', 'description': 'Weekly seminar on current physics research.' },
+            { 'title': 'Career Fair', 'type': 'Networking', 'programme': 'Engineering', 'description': 'Meet potential employers and learn about internships.' },
         ]
 
     def _norm(self, s: str) -> str:

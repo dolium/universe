@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Jobs') }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="courses-hero">
+  <div class="container">
+    <h1>{{ _('Jobs') }}</h1>
+    <p>{{ _('Job opportunities submitted by the community') }}</p>
+    <div style="margin-top:16px; display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start; justify-content:center;">
+      {% if form_url %}
+        <a class="btn btn-primary" target="_blank" rel="noopener" href="{{ form_url }}">{{ _('Add new job') }}</a>
+      {% endif %}
+
+      <form method="get" action="{{ url_for('jobs') }}" style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start; justify-content:center; max-width:900px;">
+        <select name="type" onchange="this.form.submit()" class="btn small" style="background:var(--panel);border-color:#2a2b33;">
+          <option value="">{{ _('All types') }}</option>
+          {% for t in filters_types %}
+            <option value="{{ t }}" {% if selected_type and selected_type|lower == t|lower %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+
+        {% if filters_programmes %}
+        <div class="course-filters" style="margin:0; min-width:260px;">
+          <div class="course-filters-header">
+            <span class="course-filters-label">{{ _('Study programmes:') }}</span>
+            {% if selected_programmes and selected_programmes|length < filters_programmes|length %}
+            <span class="course-filters-active">{{ _('%(count)d selected', count=selected_programmes|length) }}</span>
+            {% endif %}
+          </div>
+          <div class="course-filters-grid">
+            {% for p in filters_programmes %}
+            {% set p_lower = p.lower() %}
+            <label class="course-filter-pill">
+              <input
+                type="checkbox"
+                name="programme"
+                value="{{ p }}"
+                {% if p_lower in selected_programmes %}checked{% endif %}
+              />
+              <span>{{ p }}</span>
+            </label>
+            {% endfor %}
+          </div>
+          <div class="course-filters-actions">
+            <button type="submit" class="btn small btn-ok-dark">OK</button>
+            {% if selected_type or selected_programmes %}
+            <a href="{{ url_for('jobs') }}" class="btn small">{{ _('Reset') }}</a>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </form>
+    </div>
+    <p class="muted" style="margin-top:8px">{{ _('Showing %(count)d of %(total)d jobs', count=items|length, total=total_count) }}</p>
+  </div>
+</section>
+
+<div class="container">
+  <div class="courses-grid">
+    {% for item in items %}
+    <div class="course-card">
+      <div class="course-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 7h-9" />
+          <path d="M14 17H5" />
+          <circle cx="17" cy="17" r="3" />
+          <circle cx="7" cy="7" r="3" />
+        </svg>
+      </div>
+      <h3 class="course-title">{{ item.title }}</h3>
+      <p class="course-professor">{{ item.type }}{% if item.programme %} • {{ item.programme }}{% endif %}</p>
+      <p class="course-description">{{ item.description }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -32,11 +32,19 @@ msgstr "Kurse"
 msgid "Opportunities"
 msgstr "Möglichkeiten"
 
-#: templates/base.html:23
+#: templates/base.html:22 templates/jobs.html:3 templates/jobs.html:8
+msgid "Jobs"
+msgstr "Stellen"
+
+#: templates/base.html:23 templates/events.html:3 templates/events.html:8
+msgid "Events"
+msgstr "Veranstaltungen"
+
+#: templates/base.html:24
 msgid "Professor Availability"
 msgstr "Professorenverfügbarkeit"
 
-#: templates/base.html:24
+#: templates/base.html:25
 msgid "Profiles"
 msgstr "Profile"
 
@@ -211,4 +219,31 @@ msgstr "Studiengänge:"
 #, python-format
 msgid "Showing %(count)d of %(total)d opportunities"
 msgstr "Zeige %(count)d von %(total)d Möglichkeiten"
+
+#: templates/jobs.html:9
+msgid "Job opportunities submitted by the community"
+msgstr "Stellenangebote von der Community eingereicht"
+
+#: templates/jobs.html:12
+msgid "Add new job"
+msgstr "Neue Stelle hinzufügen"
+
+#: templates/jobs.html:55
+#, python-format
+msgid "Showing %(count)d of %(total)d jobs"
+msgstr "Zeige %(count)d von %(total)d Stellen"
+
+#: templates/events.html:9
+msgid "Events and activities submitted by the community"
+msgstr "Veranstaltungen und Aktivitäten von der Community eingereicht"
+
+#: templates/events.html:12
+msgid "Add new event"
+msgstr "Neue Veranstaltung hinzufügen"
+
+#: templates/events.html:55
+#, python-format
+msgid "Showing %(count)d of %(total)d events"
+msgstr "Zeige %(count)d von %(total)d Veranstaltungen"
+
 
