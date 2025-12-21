@@ -10,7 +10,7 @@ from config import Config
 class GoogleSheetsService:
     """
     Service class for interacting with Google Sheets API.
-    Handles fetching courses, materials, and opportunities data.
+    Handles fetching courses, materials, jobs, and events data.
     Falls back to dummy data if Google Sheets is not configured.
     """
 

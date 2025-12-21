@@ -4,7 +4,7 @@
 
 """
 Flask application for UniVerse - A social-academic hub for students.
-Provides courses, materials, and opportunities management.
+Provides courses, materials, jobs, and events management.
 """
 from typing import Dict, List
 from flask import Flask, render_template, abort, request, redirect, url_for, flash, session
