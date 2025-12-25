@@ -5,8 +5,8 @@
 {% block content %}
 <div class="courses-hero">
     <div class="container">
-        <h1>{{ _('STEM Courses') }}</h1>
-        <p>{{ _('Explore our STEM catalog — mathematics, physics, chemistry, biology, CS, and engineering') }}</p>
+        <h1>{{ _('Courses at OTH Amberg-Weiden') }}</h1>
+        <p>{{ _('Browse courses across all faculties – engineering, business, computer science, social sciences and more. Each page brings together materials, notes and links that students at OTH Amberg-Weiden actually use.') }}</p>
     </div>
 </div>
 
@@ -47,6 +47,7 @@
         {% for course in courses %}
         <a href="{{ url_for('course_detail', slug=course.slug) }}" class="course-card">
             <div class="course-icon">
+                {# Keep existing icon mapping; icons are just visual and not restricted to STEM #}
                 {% if course.icon == 'math' %}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="4" y1="12" x2="10" y2="12"></line>
@@ -93,10 +94,10 @@
             <p class="course-professor">{{ course.professor }}</p>
             {% endif %}
             {% if course.programme %}
-            <p class="course-programme-tag">Study programme: {{ course.programme }}</p>
+            <p class="course-programme-tag">{{ _('Study programme: %(programme)s', programme=course.programme) }}</p>
             {% endif %}
             <p class="course-description">{{ course.description }}</p>
-            <span class="course-link">Explore Course →</span>
+            <span class="course-link">{{ _('Open course page →') }}</span>
         </a>
         {% endfor %}
     </div>

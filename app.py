@@ -11,6 +11,7 @@ from flask import Flask, render_template, abort, request, redirect, url_for, fla
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_babel import Babel
 import bcrypt
+import re
 from config import get_config
 from google_sheets_service import sheets_service
 
@@ -444,6 +445,12 @@ def create_app(config_name: str = None) -> Flask:
 
             if not email or not password:
                 flash('Please provide both email and password.', 'error')
+                return render_template('login.html', **get_common_template_context())
+
+            # Enforce institutional email format: a.bondarenko@oth-aw.de
+            email_pattern = r'^[a-z]+\.[a-z]+@oth-aw\.de$'
+            if not re.match(email_pattern, email):
+                flash('Please use your OTH Amberg-Weiden email (e.g. a.bondarenko@oth-aw.de).', 'error')
                 return render_template('login.html', **get_common_template_context())
 
             # Get user from Google Sheets

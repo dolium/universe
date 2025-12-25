@@ -1,0 +1,163 @@
+┌─────────────────────────────────────────────────────────────────────┐
+│  ✅ JOBS AND EVENTS GOOGLE SHEETS INTEGRATION - COMPLETE            │
+└─────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════
+  GOOGLE SHEETS STRUCTURE
+═══════════════════════════════════════════════════════════════════════
+
+Your Google Sheets Document:
+├── 📊 Jobs Tab
+│   ├── Column: Title              → Displayed as job title
+│   ├── Column: Type               → Used for filtering
+│   ├── Column: Study Programme    → Used for filtering
+│   └── Column: Description        → Displayed in job card
+│
+└── 📊 Events Tab
+    ├── Column: Title              → Displayed as event title
+    ├── Column: Type               → Used for filtering
+    ├── Column: Study Programme    → Used for filtering
+    └── Column: Description        → Displayed in event card
+
+═══════════════════════════════════════════════════════════════════════
+  WEBSITE PAGES
+═══════════════════════════════════════════════════════════════════════
+
+🌐 /jobs Page
+   ├── 📥 Fetches: sheets_service.get_jobs()
+   ├── 🎯 Filters: By Type & Study Programmes
+   ├── 📝 Template: templates/jobs.html
+   └── ➕ Button: "Add new job" → Links to Google Sheet
+
+🌐 /events Page
+   ├── 📥 Fetches: sheets_service.get_events()
+   ├── 🎯 Filters: By Type & Study Programmes
+   ├── 📝 Template: templates/events.html
+   └── ➕ Button: "Add new event" → Links to Google Sheet
+
+═══════════════════════════════════════════════════════════════════════
+  DATA FLOW DIAGRAM
+═══════════════════════════════════════════════════════════════════════
+
+User Updates Google Sheets
+         ↓
+    [Jobs Tab]  or  [Events Tab]
+         ↓
+    Google Sheets API
+         ↓
+    credentials.json (authentication)
+         ↓
+    google_sheets_service.py
+         ├─→ get_jobs()
+         └─→ get_events()
+         ↓
+    app.py (Flask routes)
+         ├─→ /jobs route
+         └─→ /events route
+         ↓
+    Filter by Type & Programmes
+         ↓
+    Render Template
+         ├─→ jobs.html
+         └─→ events.html
+         ↓
+    Display in Browser (with filters)
+
+═══════════════════════════════════════════════════════════════════════
+  FEATURES IMPLEMENTED
+═══════════════════════════════════════════════════════════════════════
+
+✅ Automatic data refresh from Google Sheets
+✅ Flexible column name matching (Title, Type, Study Programme, Description)
+✅ Type filter (dropdown selection)
+✅ Multiple Study Programme filters (checkbox selection)
+✅ Filtered count display (showing X of Y total)
+✅ "Add new" buttons linking to Google Sheets
+✅ Fallback to sample data if Google Sheets unavailable
+✅ Mobile-responsive card layout
+✅ Consistent styling with rest of website
+
+═══════════════════════════════════════════════════════════════════════
+  CONFIGURATION FILES
+═══════════════════════════════════════════════════════════════════════
+
+📄 config.py
+   ├── JOBS_WORKSHEET_NAME = 'Jobs'
+   ├── EVENTS_WORKSHEET_NAME = 'Events'
+   ├── ADD_JOB_SHEET_URL = "https://docs.google.com/..."
+   └── ADD_EVENT_SHEET_URL = "https://docs.google.com/..."
+
+📄 google_sheets_service.py
+   ├── get_jobs() → Returns List[Dict] from Jobs sheet
+   └── get_events() → Returns List[Dict] from Events sheet
+
+📄 app.py
+   ├── @application.route('/jobs')
+   └── @application.route('/events')
+
+═══════════════════════════════════════════════════════════════════════
+  HOW TO USE
+═══════════════════════════════════════════════════════════════════════
+
+1. 📝 Edit Google Sheets:
+   • Open your Google Sheets document
+   • Go to "Jobs" or "Events" tab
+   • Add/edit/delete rows
+   • Use columns: Title, Type, Study Programme, Description
+
+2. 🔄 Refresh Website:
+   • Simply refresh your browser
+   • Changes appear immediately!
+
+3. 🎯 Filter Results:
+   • Use Type dropdown
+   • Select Study Programmes via checkboxes
+   • Click OK to apply filters
+
+═══════════════════════════════════════════════════════════════════════
+  TEST VERIFICATION
+═══════════════════════════════════════════════════════════════════════
+
+Run: python test_jobs_events_integration.py
+
+Expected Output:
+   ✓ Retrieved X jobs from Google Sheets
+   ✓ Retrieved Y events from Google Sheets
+   ✓ All required fields present: title, type, programme, description
+   ✓ All tests passed!
+
+═══════════════════════════════════════════════════════════════════════
+  EXAMPLE DATA
+═══════════════════════════════════════════════════════════════════════
+
+Jobs Sheet:
+┌──────────────────────┬───────────┬─────────────────┬─────────────────┐
+│ Title                │ Type      │ Study Programme │ Description     │
+├──────────────────────┼───────────┼─────────────────┼─────────────────┤
+│ Research Assistant   │ Full-time │ CS              │ AI research...  │
+│ Teaching Assistant   │ Part-time │ Mathematics     │ Calculus tut... │
+│ Lab Assistant        │ Part-time │ Physics         │ Lab sessions... │
+└──────────────────────┴───────────┴─────────────────┴─────────────────┘
+
+Events Sheet:
+┌──────────────────────┬─────────────┬─────────────────┬─────────────────┐
+│ Title                │ Type        │ Study Programme │ Description     │
+├──────────────────────┼─────────────┼─────────────────┼─────────────────┤
+│ Hackathon Weekend    │ Competition │ CS              │ 48h hackath...  │
+│ Career Fair          │ Networking  │ Engineering     │ Meet employ...  │
+│ Physics Colloquium   │ Seminar     │ Physics         │ Research sem... │
+└──────────────────────┴─────────────┴─────────────────┴─────────────────┘
+
+═══════════════════════════════════════════════════════════════════════
+  ✅ STATUS: FULLY IMPLEMENTED AND WORKING
+═══════════════════════════════════════════════════════════════════════
+
+No additional work required! Your Jobs and Events pages are:
+   • Connected to Google Sheets ✅
+   • Using correct tabs (Jobs & Events) ✅
+   • Reading correct fields (Title, Type, Study Programme, Description) ✅
+   • Displaying with filters ✅
+   • Auto-refreshing on page load ✅
+
+═══════════════════════════════════════════════════════════════════════
+
