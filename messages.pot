@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-13 12:43+0000\n"
+"POT-Creation-Date: 2025-12-25 14:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,18 +17,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: templates/base.html:20
-msgid "Mission"
-msgstr ""
-
-#: templates/base.html:21 templates/courses.html:3 templates/index.html:14
+#: templates/base.html:20 templates/courses.html:3 templates/index.html:14
 #: templates/index.html:27
 msgid "Courses"
 msgstr ""
 
-#: templates/base.html:22 templates/index.html:15 templates/index.html:36
-#: templates/opportunities.html:3 templates/opportunities.html:8
-msgid "Opportunities"
+#: templates/base.html:21 templates/jobs.html:3 templates/jobs.html:8
+msgid "Jobs"
+msgstr ""
+
+#: templates/base.html:22 templates/events.html:3 templates/events.html:8
+msgid "Events"
 msgstr ""
 
 #: templates/base.html:23
@@ -39,36 +38,28 @@ msgstr ""
 msgid "Profiles"
 msgstr ""
 
-#: templates/base.html:25 templates/index.html:16 templates/index.html:45
-msgid "How‑to"
-msgstr ""
-
-#: templates/base.html:26
-msgid "Contribute"
-msgstr ""
-
-#: templates/base.html:38
+#: templates/base.html:36
 #, python-format
 msgid "Hi, %(name)s!"
 msgstr ""
 
-#: templates/base.html:39
+#: templates/base.html:37
 msgid "My Account"
 msgstr ""
 
-#: templates/base.html:40
+#: templates/base.html:38
 msgid "Logout"
 msgstr ""
 
-#: templates/base.html:42
+#: templates/base.html:40
 msgid "Login"
 msgstr ""
 
-#: templates/base.html:43
+#: templates/base.html:41
 msgid "Register"
 msgstr ""
 
-#: templates/base.html:69
+#: templates/base.html:67
 msgid "Built by students, for students."
 msgstr ""
 
@@ -86,12 +77,14 @@ msgstr ""
 msgid "Filter by study programme:"
 msgstr ""
 
-#: templates/courses.html:19 templates/opportunities.html:28
+#: templates/courses.html:19 templates/events.html:28 templates/jobs.html:28
+#: templates/opportunities.html:28
 #, python-format
 msgid "%(count)d selected"
 msgstr ""
 
-#: templates/courses.html:39 templates/opportunities.html:48
+#: templates/courses.html:39 templates/events.html:48 templates/jobs.html:48
+#: templates/opportunities.html:48
 msgid "Reset"
 msgstr ""
 
@@ -100,23 +93,54 @@ msgstr ""
 msgid "Showing %(count)d of %(total)d courses"
 msgstr ""
 
+#: templates/events.html:9
+msgid "Events and activities submitted by the community"
+msgstr ""
+
+#: templates/events.html:12
+msgid "Add new event"
+msgstr ""
+
+#: templates/events.html:17 templates/jobs.html:17
+#: templates/opportunities.html:17
+msgid "All types"
+msgstr ""
+
+#: templates/events.html:26 templates/jobs.html:26
+#: templates/opportunities.html:26
+msgid "Study programmes:"
+msgstr ""
+
+#: templates/events.html:55
+#, python-format
+msgid "Showing %(count)d of %(total)d events"
+msgstr ""
+
 #: templates/index.html:3
 msgid "Public Landing"
 msgstr ""
 
 #: templates/index.html:10
 msgid ""
-"A social‑academic platform that helps students share notes, connect, and "
-"find their way – from courses and thesis help to housing tips and campus "
-"life."
+"Your student hub for OTH Amberg-Weiden. Share study materials, discover "
+"opportunities, and connect with fellow students across both campuses."
 msgstr ""
 
 #: templates/index.html:14
 msgid "Find and organize course pages"
 msgstr ""
 
+#: templates/index.html:15 templates/index.html:36
+#: templates/opportunities.html:3 templates/opportunities.html:8
+msgid "Opportunities"
+msgstr ""
+
 #: templates/index.html:15
 msgid "Housing, jobs, events, mentoring"
+msgstr ""
+
+#: templates/index.html:16 templates/index.html:45
+msgid "How‑to"
 msgstr ""
 
 #: templates/index.html:16
@@ -133,23 +157,24 @@ msgstr ""
 
 #: templates/index.html:29
 msgid ""
-"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer "
-"tincidunt nunc eu pulvinar suscipit. Focus: structured course hubs with "
-"links to lectures, study groups, and smart matching for peers."
+"Access course materials, exam prep resources, and professor availability "
+"for your study programme. From Applied Computer Science to International "
+"Business, find lecture notes, cheat sheets, and study guides shared by "
+"your peers."
 msgstr ""
 
 #: templates/index.html:38
 msgid ""
-"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula "
-"urna at dignissim efficitur. Find housing leads, part‑time jobs, "
-"mentoring offers, and local events all in one place."
+"Browse student jobs, internships, and events in the Oberpfalz region. "
+"Whether you need a working student position in engineering, housing in "
+"Amberg or Weiden, or want to join campus activities – find it all here."
 msgstr ""
 
 #: templates/index.html:47
 msgid ""
-"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus "
-"lacinia eros vitae mollis laoreet. Quick guides for visas, enrollment, "
-"bureaucracy, and everyday campus hacks."
+"Practical guides for international students: German visa requirements, "
+"enrollment at OTH, navigating Bavarian bureaucracy, and settling in "
+"Amberg or Weiden. Learn from students who have been through it."
 msgstr ""
 
 #: templates/index.html:54
@@ -170,8 +195,21 @@ msgstr ""
 
 #: templates/index.html:61
 msgid ""
-"Ideas welcome: AI assistant, reputation & mentorship, OTH integrations, "
-"dashboards."
+"Ideas welcome: AI study assistant, student mentorship matching, OTH "
+"timetable integration, and personalized dashboards."
+msgstr ""
+
+#: templates/jobs.html:9
+msgid "Job opportunities submitted by the community"
+msgstr ""
+
+#: templates/jobs.html:12
+msgid "Add new job"
+msgstr ""
+
+#: templates/jobs.html:55
+#, python-format
+msgid "Showing %(count)d of %(total)d jobs"
 msgstr ""
 
 #: templates/opportunities.html:9
@@ -180,14 +218,6 @@ msgstr ""
 
 #: templates/opportunities.html:12
 msgid "Add new opportunity"
-msgstr ""
-
-#: templates/opportunities.html:17
-msgid "All types"
-msgstr ""
-
-#: templates/opportunities.html:26
-msgid "Study programmes:"
 msgstr ""
 
 #: templates/opportunities.html:55
