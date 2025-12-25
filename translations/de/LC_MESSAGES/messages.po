@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-13 12:43+0000\n"
+"POT-Creation-Date: 2025-12-25 14:54+0000\n"
 "PO-Revision-Date: 2025-12-13 12:41+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -18,66 +18,49 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: templates/base.html:20
-msgid "Mission"
-msgstr "Mission"
-
-#: templates/base.html:21 templates/courses.html:3 templates/index.html:14
+#: templates/base.html:20 templates/courses.html:3 templates/index.html:14
 #: templates/index.html:27
 msgid "Courses"
 msgstr "Kurse"
 
-#: templates/base.html:22 templates/index.html:15 templates/index.html:36
-#: templates/opportunities.html:3 templates/opportunities.html:8
-msgid "Opportunities"
-msgstr "Möglichkeiten"
-
-#: templates/base.html:22 templates/jobs.html:3 templates/jobs.html:8
+#: templates/base.html:21 templates/jobs.html:3 templates/jobs.html:8
 msgid "Jobs"
 msgstr "Stellen"
 
-#: templates/base.html:23 templates/events.html:3 templates/events.html:8
+#: templates/base.html:22 templates/events.html:3 templates/events.html:8
 msgid "Events"
 msgstr "Veranstaltungen"
 
-#: templates/base.html:24
+#: templates/base.html:23
 msgid "Professor Availability"
 msgstr "Professorenverfügbarkeit"
 
-#: templates/base.html:25
+#: templates/base.html:24
 msgid "Profiles"
 msgstr "Profile"
 
-#: templates/base.html:25 templates/index.html:16 templates/index.html:45
-msgid "How‑to"
-msgstr "Anleitungen"
-
-#: templates/base.html:26
-msgid "Contribute"
-msgstr "Beitragen"
-
-#: templates/base.html:38
+#: templates/base.html:36
 #, python-format
 msgid "Hi, %(name)s!"
 msgstr "Hallo, %(name)s!"
 
-#: templates/base.html:39
+#: templates/base.html:37
 msgid "My Account"
 msgstr "Mein Konto"
 
-#: templates/base.html:40
+#: templates/base.html:38
 msgid "Logout"
 msgstr "Abmelden"
 
-#: templates/base.html:42
+#: templates/base.html:40
 msgid "Login"
 msgstr "Anmelden"
 
-#: templates/base.html:43
+#: templates/base.html:41
 msgid "Register"
 msgstr "Registrieren"
 
-#: templates/base.html:69
+#: templates/base.html:67
 msgid "Built by students, for students."
 msgstr "Von Studierenden für Studierende."
 
@@ -90,19 +73,21 @@ msgid ""
 "Explore our STEM catalog — mathematics, physics, chemistry, biology, CS, "
 "and engineering"
 msgstr ""
-"Erkunden Sie unseren STEM-Katalog — Mathematik, Physik, Chemie, Biologie, "
-"Informatik und Ingenieurwesen"
+"Erkunden Sie unseren STEM-Katalog — Mathematik, Physik, Chemie, Biologie,"
+" Informatik und Ingenieurwesen"
 
 #: templates/courses.html:17
 msgid "Filter by study programme:"
 msgstr "Nach Studiengang filtern:"
 
-#: templates/courses.html:19 templates/opportunities.html:28
+#: templates/courses.html:19 templates/events.html:28 templates/jobs.html:28
+#: templates/opportunities.html:28
 #, python-format
 msgid "%(count)d selected"
 msgstr "%(count)d ausgewählt"
 
-#: templates/courses.html:39 templates/opportunities.html:48
+#: templates/courses.html:39 templates/events.html:48 templates/jobs.html:48
+#: templates/opportunities.html:48
 msgid "Reset"
 msgstr "Zurücksetzen"
 
@@ -111,27 +96,58 @@ msgstr "Zurücksetzen"
 msgid "Showing %(count)d of %(total)d courses"
 msgstr "Zeige %(count)d von %(total)d Kursen"
 
+#: templates/events.html:9
+msgid "Events and activities submitted by the community"
+msgstr "Veranstaltungen und Aktivitäten von der Community eingereicht"
+
+#: templates/events.html:12
+msgid "Add new event"
+msgstr "Neue Veranstaltung hinzufügen"
+
+#: templates/events.html:17 templates/jobs.html:17
+#: templates/opportunities.html:17
+msgid "All types"
+msgstr "Alle Typen"
+
+#: templates/events.html:26 templates/jobs.html:26
+#: templates/opportunities.html:26
+msgid "Study programmes:"
+msgstr "Studiengänge:"
+
+#: templates/events.html:55
+#, python-format
+msgid "Showing %(count)d of %(total)d events"
+msgstr "Zeige %(count)d von %(total)d Veranstaltungen"
+
 #: templates/index.html:3
 msgid "Public Landing"
 msgstr "Öffentliche Startseite"
 
 #: templates/index.html:10
 msgid ""
-"A social‑academic platform that helps students share notes, connect, and "
-"find their way – from courses and thesis help to housing tips and campus "
-"life."
+"Your student hub for OTH Amberg-Weiden. Share study materials, discover "
+"opportunities, and connect with fellow students across both campuses."
 msgstr ""
-"Eine sozial-akademische Plattform, die Studierenden hilft, Notizen zu "
-"teilen, sich zu vernetzen und ihren Weg zu finden – von Kursen und "
-"Abschlussarbeitshilfe bis zu Wohnungstipps und Campusleben."
+"Deine Studenten-Plattform für die OTH Amberg-Weiden. Teile "
+"Studienmaterialien, entdecke Möglichkeiten und vernetze dich mit "
+"Kommilitonen an beiden Standorten."
 
 #: templates/index.html:14
 msgid "Find and organize course pages"
 msgstr "Kursseiten finden und organisieren"
 
+#: templates/index.html:15 templates/index.html:36
+#: templates/opportunities.html:3 templates/opportunities.html:8
+msgid "Opportunities"
+msgstr "Möglichkeiten"
+
 #: templates/index.html:15
 msgid "Housing, jobs, events, mentoring"
 msgstr "Wohnungen, Jobs, Veranstaltungen, Mentoring"
+
+#: templates/index.html:16 templates/index.html:45
+msgid "How‑to"
+msgstr "Anleitungen"
 
 #: templates/index.html:16
 msgid "Visa, bureaucracy, campus tips"
@@ -147,31 +163,37 @@ msgstr "Hier beitragen"
 
 #: templates/index.html:29
 msgid ""
-"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer "
-"tincidunt nunc eu pulvinar suscipit. Focus: structured course hubs with "
-"links to lectures, study groups, and smart matching for peers."
+"Access course materials, exam prep resources, and professor availability "
+"for your study programme. From Applied Computer Science to International "
+"Business, find lecture notes, cheat sheets, and study guides shared by "
+"your peers."
 msgstr ""
-"Strukturierte Kurs-Hubs mit Links zu Vorlesungen, Lerngruppen und "
-"intelligentem Matching für Kommilitonen. Finden Sie alle "
-"Kursinformationen an einem Ort."
+"Greife auf Kursmaterialien, Prüfungsvorbereitungen und "
+"Professorenverfügbarkeit für deinen Studiengang zu. Von Angewandter "
+"Informatik bis Internationales Management, finde Vorlesungsnotizen, "
+"Spickzettel und Lernhilfen von deinen Kommilitonen."
 
 #: templates/index.html:38
 msgid ""
-"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula "
-"urna at dignissim efficitur. Find housing leads, part‑time jobs, "
-"mentoring offers, and local events all in one place."
+"Browse student jobs, internships, and events in the Oberpfalz region. "
+"Whether you need a working student position in engineering, housing in "
+"Amberg or Weiden, or want to join campus activities – find it all here."
 msgstr ""
-"Finden Sie Wohnungsangebote, Teilzeitjobs, Mentoring-Angebote und lokale "
-"Veranstaltungen – alles an einem Ort."
+"Durchsuche Studentenjobs, Praktika und Veranstaltungen in der Oberpfalz. "
+"Ob du eine Werkstudentenstelle im Ingenieurwesen, eine Wohnung in Amberg "
+"oder Weiden suchst oder an Campus-Aktivitäten teilnehmen möchtest – finde "
+"alles hier."
 
 #: templates/index.html:47
 msgid ""
-"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus "
-"lacinia eros vitae mollis laoreet. Quick guides for visas, enrollment, "
-"bureaucracy, and everyday campus hacks."
+"Practical guides for international students: German visa requirements, "
+"enrollment at OTH, navigating Bavarian bureaucracy, and settling in "
+"Amberg or Weiden. Learn from students who have been through it."
 msgstr ""
-"Schnelle Anleitungen für Visa, Einschreibung, Bürokratie und alltägliche "
-"Campus-Tricks."
+"Praktische Anleitungen für internationale Studierende: Deutsche "
+"Visumsanforderungen, Immatrikulation an der OTH, Navigation durch die "
+"bayerische Bürokratie und Einleben in Amberg oder Weiden. Lerne von "
+"Studenten, die es bereits durchlaufen haben."
 
 #: templates/index.html:54
 msgid "How to contribute"
@@ -193,32 +215,11 @@ msgstr "Schreiben Sie eine kurze Beschreibung und öffnen Sie einen Pull Request
 
 #: templates/index.html:61
 msgid ""
-"Ideas welcome: AI assistant, reputation & mentorship, OTH integrations, "
-"dashboards."
+"Ideas welcome: AI study assistant, student mentorship matching, OTH "
+"timetable integration, and personalized dashboards."
 msgstr ""
-"Ideen willkommen: KI-Assistent, Reputation & Mentoring, OTH-"
-"Integrationen, Dashboards."
-
-#: templates/opportunities.html:9
-msgid "Jobs, events, study groups, and more submitted by the community"
-msgstr "Jobs, Veranstaltungen, Lerngruppen und mehr von der Community eingereicht"
-
-#: templates/opportunities.html:12
-msgid "Add new opportunity"
-msgstr "Neue Möglichkeit hinzufügen"
-
-#: templates/opportunities.html:17
-msgid "All types"
-msgstr "Alle Typen"
-
-#: templates/opportunities.html:26
-msgid "Study programmes:"
-msgstr "Studiengänge:"
-
-#: templates/opportunities.html:55
-#, python-format
-msgid "Showing %(count)d of %(total)d opportunities"
-msgstr "Zeige %(count)d von %(total)d Möglichkeiten"
+"Ideen willkommen: KI-Lernassistent, Studenten-Mentoring-Matching, OTH-"
+"Stundenplan-Integration und personalisierte Dashboards."
 
 #: templates/jobs.html:9
 msgid "Job opportunities submitted by the community"
@@ -233,17 +234,70 @@ msgstr "Neue Stelle hinzufügen"
 msgid "Showing %(count)d of %(total)d jobs"
 msgstr "Zeige %(count)d von %(total)d Stellen"
 
-#: templates/events.html:9
-msgid "Events and activities submitted by the community"
-msgstr "Veranstaltungen und Aktivitäten von der Community eingereicht"
+#: templates/opportunities.html:9
+msgid "Jobs, events, study groups, and more submitted by the community"
+msgstr "Jobs, Veranstaltungen, Lerngruppen und mehr von der Community eingereicht"
 
-#: templates/events.html:12
-msgid "Add new event"
-msgstr "Neue Veranstaltung hinzufügen"
+#: templates/opportunities.html:12
+msgid "Add new opportunity"
+msgstr "Neue Möglichkeit hinzufügen"
 
-#: templates/events.html:55
+#: templates/opportunities.html:55
 #, python-format
-msgid "Showing %(count)d of %(total)d events"
-msgstr "Zeige %(count)d von %(total)d Veranstaltungen"
+msgid "Showing %(count)d of %(total)d opportunities"
+msgstr "Zeige %(count)d von %(total)d Möglichkeiten"
 
+#~ msgid "Mission"
+#~ msgstr "Mission"
+
+#~ msgid "Contribute"
+#~ msgstr "Beitragen"
+
+#~ msgid ""
+#~ "A social‑academic platform that helps "
+#~ "students share notes, connect, and find"
+#~ " their way – from courses and "
+#~ "thesis help to housing tips and "
+#~ "campus life."
+#~ msgstr ""
+#~ "Eine sozial-akademische Plattform, die "
+#~ "Studierenden hilft, Notizen zu teilen, "
+#~ "sich zu vernetzen und ihren Weg zu"
+#~ " finden – von Kursen und "
+#~ "Abschlussarbeitshilfe bis zu Wohnungstipps und"
+#~ " Campusleben."
+
+#~ msgid ""
+#~ "Lorem ipsum dolor sit amet, consectetur"
+#~ " adipiscing elit. Integer tincidunt nunc"
+#~ " eu pulvinar suscipit. Focus: structured"
+#~ " course hubs with links to lectures,"
+#~ " study groups, and smart matching for"
+#~ " peers."
+#~ msgstr ""
+#~ "Strukturierte Kurs-Hubs mit Links zu "
+#~ "Vorlesungen, Lerngruppen und intelligentem "
+#~ "Matching für Kommilitonen. Finden Sie "
+#~ "alle Kursinformationen an einem Ort."
+
+#~ msgid ""
+#~ "Lorem ipsum dolor sit amet, consectetur"
+#~ " adipiscing elit. Cras vehicula urna "
+#~ "at dignissim efficitur. Find housing "
+#~ "leads, part‑time jobs, mentoring offers, "
+#~ "and local events all in one place."
+#~ msgstr ""
+#~ "Finden Sie Wohnungsangebote, Teilzeitjobs, "
+#~ "Mentoring-Angebote und lokale Veranstaltungen "
+#~ "– alles an einem Ort."
+
+#~ msgid ""
+#~ "Lorem ipsum dolor sit amet, consectetur"
+#~ " adipiscing elit. Phasellus lacinia eros"
+#~ " vitae mollis laoreet. Quick guides "
+#~ "for visas, enrollment, bureaucracy, and "
+#~ "everyday campus hacks."
+#~ msgstr ""
+#~ "Schnelle Anleitungen für Visa, Einschreibung,"
+#~ " Bürokratie und alltägliche Campus-Tricks."
 
